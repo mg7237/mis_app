@@ -36,7 +36,8 @@ void main() async {
   );
 
   //check is apple signin is available
-  await Utils.checkAppleSignInAvailable();
+  //await Utils.checkAppleSignInAvailable();
+
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (context) => ThemeNotifier()),
   ], child: MyApp()));
