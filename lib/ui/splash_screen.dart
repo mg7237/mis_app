@@ -40,7 +40,6 @@ class _SplashScreenState extends State<SplashScreen> {
           .setString(PreferenceConnector.THEME_SELECTED, globals.theme);
     }
     Navigator.pushReplacementNamed(context, LOGIN);
-    //Navigator.pushReplacementNamed(context, HOME_PAGE);
   }
 
   @override
