@@ -123,7 +123,7 @@ class NoInternet extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            Image.asset("assets/icon/login_logo.png"),
+            Image.asset("assets/icon/app_logo.png"),
             Image.asset("assets/no_internet.png"),
           ],
         ),

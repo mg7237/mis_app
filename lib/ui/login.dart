@@ -12,64 +12,64 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-  bool _showConfiguration = false;
-  FocusNode _focusNodeUserId = FocusNode();
-  FocusNode _focusNodePassword = FocusNode();
-  FocusNode _focusNodeConfigureURL = FocusNode();
-  FocusNode _focusNodeLoginBtn = FocusNode();
-  FocusNode _focusNodeConfigureBtn = FocusNode();
+  final FocusNode _focusNodeUserId = FocusNode();
+  final FocusNode _focusNodePassword = FocusNode();
+  final FocusNode _focusNodeLoginBtn = FocusNode();
 
   static final TextEditingController _userIdController =
       TextEditingController();
   static final TextEditingController _passwordController =
       TextEditingController();
-  static final TextEditingController _configureURLController =
-      TextEditingController();
 
+  bool passwordVisible = false;
+  bool rememberMe = false;
   _cancel() {}
 
+  _showHidePassword() {
+    setState(() {
+      passwordVisible = !passwordVisible;
+    });
+  }
+
   _login() {
-    Navigator.push(
+    Navigator.pushReplacement(
         context, MaterialPageRoute(builder: (context) => AdminMenu()));
   }
 
-  _saveURL() {}
-
   @override
   Widget build(BuildContext context) {
-    return Consumer<ThemeNotifier>(
-      builder: (context, theme, _) => MaterialApp(
-          theme: theme.getTheme(),
-          home: SafeArea(
-              child: Material(
-            child: SingleChildScrollView(
-                child: Column(
-              children: [
-                Container(
-                    width: double.infinity,
-                    color: Colors.white,
-                    child: Center(
-                        child: Image(
-                            image: AssetImage('assets/icon/login_logo.png')))),
-                Container(
-                  height: 350,
-                  width: double.infinity,
-                  decoration: BoxDecoration(color: Colors.blue[900]),
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      body: Consumer<ThemeNotifier>(
+        builder: (context, theme, _) => MaterialApp(
+            theme: theme.getTheme(),
+            home: SafeArea(
+                child: Material(
+              child: SingleChildScrollView(
                   child: Column(
-                    children: [
-                      SizedBox(
-                        height: 20,
-                      ),
-                      Container(
-                        width: MediaQuery.of(context).size.width - 50,
-                        height: 50,
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(15))),
-                        child: EnsureVisibleWhenFocused(
-                          focusNode: _focusNodeUserId,
-                          child: new TextFormField(
+                children: [
+                  Container(
+                      width: MediaQuery.of(context).size.width - 100,
+                      height: MediaQuery.of(context).size.width - 100,
+                      child: Center(
+                          child: Image(
+                              image: AssetImage('assets/icon/app_logo.png')))),
+                  Container(
+                    width: double.infinity,
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          height: 40,
+                        ),
+                        Container(
+                          width: MediaQuery.of(context).size.width - 50,
+                          height: 50,
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10))),
+                          child: TextFormField(
+                            autofocus: true,
                             //enabled: !showLoader,
                             style: TextStyle(fontSize: 18),
                             decoration: const InputDecoration(
@@ -77,7 +77,7 @@ class _LoginState extends State<Login> {
                                     borderSide:
                                         BorderSide(style: BorderStyle.none),
                                     borderRadius: BorderRadius.all(
-                                        Radius.circular(15.0))),
+                                        Radius.circular(10.0))),
                                 hintText: 'User Id',
                                 hintStyle: TextStyle(color: Colors.black),
                                 fillColor: Colors.white),
@@ -100,99 +100,165 @@ class _LoginState extends State<Login> {
                             },
                           ),
                         ),
-                      ),
-                      SizedBox(height: 20),
-                      Container(
-                          width: MediaQuery.of(context).size.width - 50,
-                          height: 50,
-                          decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(15))),
-                          child: EnsureVisibleWhenFocused(
-                            focusNode: _focusNodePassword,
-                            child: new TextFormField(
-                              style: TextStyle(fontSize: 18),
-                              //enabled: !showLoader,
-                              decoration: const InputDecoration(
-                                border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.all(
-                                        Radius.circular(15.0))),
-                                hintText: 'Password',
-                                hintStyle: TextStyle(color: Colors.black),
-                              ),
+                        SizedBox(height: 20),
+                        Container(
+                            width: MediaQuery.of(context).size.width - 50,
+                            height: 50,
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10))),
+                            child: Stack(children: [
+                              TextFormField(
+                                style: TextStyle(fontSize: 18),
+                                //enabled: !showLoader,
+                                decoration: const InputDecoration(
+                                  border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(10.0))),
+                                  hintText: 'Password',
+                                  hintStyle: TextStyle(color: Colors.black),
+                                ),
 
-                              // onSaved: (value) =>
-                              //     _loginRequestModel.email = value,
-                              //validator: _loginRequestModel.emailValidate,
-                              validator: (value) {
-                                if ((value ?? '') != '') {
-                                  return null;
-                                } else
-                                  return 'Enter Password';
-                              },
-                              controller: _passwordController,
-                              focusNode: _focusNodeUserId,
-                              keyboardType: TextInputType.visiblePassword,
-                              obscureText: true,
-                              textInputAction: TextInputAction.next,
-                              onFieldSubmitted: (value) {
-                                fieldFocusChange(context, _focusNodePassword,
-                                    _focusNodeLoginBtn);
-                              },
-                            ),
-                          )),
-                      SizedBox(height: 20),
-                      Container(
-                        width: MediaQuery.of(context).size.width - 50,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Container(
-                                height: 50,
-                                width: 160,
-                                decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(15))),
+                                // onSaved: (value) =>
+                                //     _loginRequestModel.email = value,
+                                //validator: _loginRequestModel.emailValidate,
+                                validator: (value) {
+                                  if ((value ?? '') != '') {
+                                    return null;
+                                  } else
+                                    return 'Enter Password';
+                                },
+                                controller: _passwordController,
+                                focusNode: _focusNodePassword,
+                                keyboardType: TextInputType.visiblePassword,
+                                obscureText: !passwordVisible,
+                                textInputAction: TextInputAction.next,
+                                onFieldSubmitted: (value) {
+                                  fieldFocusChange(context, _focusNodePassword,
+                                      _focusNodeLoginBtn);
+                                },
+                              ),
+                              Positioned(
+                                right: 20,
+                                top: 10,
                                 child: InkWell(
-                                  child: Center(
-                                    child: Text(
-                                      'Cancel',
-                                      style: TextStyle(
-                                          fontSize: 16, color: Colors.black),
-                                    ),
-                                  ),
-                                  onTap: () => _cancel(),
-                                )),
-                            SizedBox(width: 20),
-                            Container(
-                                height: 50,
-                                width: 160,
-                                decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(15))),
-                                child: InkWell(
-                                  focusNode: _focusNodeLoginBtn,
-                                  child: Center(
-                                    child: Text(
-                                      'Login',
-                                      style: TextStyle(
-                                          fontSize: 16, color: Colors.black),
-                                    ),
-                                  ),
-                                  onTap: () => _login(),
-                                )),
-                          ],
+                                  onTap: () {
+                                    _showHidePassword();
+                                  },
+                                  child: Container(
+                                      height: 30,
+                                      width: 30,
+                                      child: Image(
+                                        image: passwordVisible
+                                            ? AssetImage(
+                                                'assets/icon/close_visibility.png')
+                                            : AssetImage(
+                                                'assets/icon/open_visibility.png'),
+                                      )),
+                                ),
+                              )
+                            ])),
+                        SizedBox(height: 10),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 15),
+                          child: Row(
+                            children: [
+                              Checkbox(
+                                  value: rememberMe,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      rememberMe = value ?? false;
+                                    });
+                                  }),
+                              SizedBox(
+                                width: 10,
+                              ),
+                              Text(
+                                'Remember Me?',
+                                style: TextStyle(fontSize: 14),
+                              )
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                        SizedBox(height: 30),
+                        Container(
+                          width: MediaQuery.of(context).size.width - 50,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Container(
+                                  height: 50,
+                                  width: 160,
+                                  decoration: BoxDecoration(
+                                      color: Colors.blue,
+                                      border: Border.all(width: 1),
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(10))),
+                                  child: InkWell(
+                                    child: Center(
+                                      child: Text(
+                                        'Cancel',
+                                        style: TextStyle(
+                                            fontSize: 16, color: Colors.white),
+                                      ),
+                                    ),
+                                    onTap: () => _cancel(),
+                                  )),
+                              SizedBox(width: 20),
+                              Container(
+                                  height: 50,
+                                  width: 160,
+                                  decoration: BoxDecoration(
+                                      color: Colors.blue,
+                                      border: Border.all(width: 1),
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(10))),
+                                  child: InkWell(
+                                    focusNode: _focusNodeLoginBtn,
+                                    child: Center(
+                                      child: Text(
+                                        'Login',
+                                        style: TextStyle(
+                                            fontSize: 16, color: Colors.white),
+                                      ),
+                                    ),
+                                    onTap: () => _login(),
+                                  )),
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          height: 30,
+                        ),
+                        Center(
+                          child: Text(
+                            'Register',
+                            style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.blue[800],
+                                decoration: TextDecoration.underline),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Center(
+                          child: Text(
+                            'Forgot Username & Password',
+                            style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.blue[800],
+                                decoration: TextDecoration.underline),
+                          ),
+                        )
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            )),
-          ))),
+                ],
+              )),
+            ))),
+      ),
     );
   }
 }

@@ -23,22 +23,23 @@ class _SplashScreenState extends State<SplashScreen> {
     if (!loggedBefore) {
       PreferenceConnector().setBool(PreferenceConnector.LOGGED_BEFORE, true);
     }
-    String themeData = await PreferenceConnector()
-        .getString(PreferenceConnector.THEME_SELECTED);
-    if (themeData != '') {
-      globals.theme = themeData;
+    // String themeData = await PreferenceConnector()
+    //     .getString(PreferenceConnector.THEME_SELECTED);
+    // if (themeData != '') {
+    //   globals.theme = themeData;
+    // } else {
+    final Brightness brightnessValue =
+        MediaQuery.of(context).platformBrightness;
+    bool isDark = brightnessValue == Brightness.dark;
+    if (isDark) {
+      globals.theme = 'DARK';
     } else {
-      final Brightness brightnessValue =
-          MediaQuery.of(context).platformBrightness;
-      bool isDark = brightnessValue == Brightness.dark;
-      if (isDark) {
-        globals.theme = 'DARK';
-      } else {
-        globals.theme = 'LIGHT';
-      }
-      PreferenceConnector()
-          .setString(PreferenceConnector.THEME_SELECTED, globals.theme);
+      globals.theme = 'LIGHT';
     }
+    globals.theme = 'LIGHT'; // MG temp hardcoding
+    PreferenceConnector()
+        .setString(PreferenceConnector.THEME_SELECTED, globals.theme);
+
     Navigator.pushReplacementNamed(context, LOGIN);
   }
 
@@ -54,7 +55,7 @@ class _SplashScreenState extends State<SplashScreen> {
       key: scaffoldState,
       body: new Center(
         child:
-            Hero(tag: "logo", child: Image.asset("assets/icon/login_logo.png")),
+            Hero(tag: "logo", child: Image.asset("assets/icon/app_logo.png")),
       ),
     );
   }

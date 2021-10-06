@@ -4,8 +4,8 @@ import 'package:mis_app/util/preference_connector.dart';
 
 class ThemeNotifier with ChangeNotifier {
   final darkTheme = ThemeData(
-    primarySwatch: Colors.grey,
-    primaryColor: Colors.black,
+    primarySwatch: Colors.blue,
+    primaryColor: Colors.blue,
     brightness: Brightness.dark,
     backgroundColor: const Color(0xFF212121),
     colorScheme: ColorScheme(
@@ -26,12 +26,16 @@ class ThemeNotifier with ChangeNotifier {
   );
 
   final lightTheme = ThemeData(
+    primarySwatch: Colors.grey,
+    primaryColor: Colors.white,
+    brightness: Brightness.light,
+    backgroundColor: Colors.white,
     colorScheme: ColorScheme(
         onPrimary: Colors.blue,
         primary: Colors.blue,
         primaryVariant: Colors.blue,
-        background: Colors.black,
-        onBackground: Colors.black,
+        background: Colors.white,
+        onBackground: Colors.white,
         onSurface: Colors.black,
         secondary: Colors.white,
         secondaryVariant: Colors.white,
@@ -50,8 +54,8 @@ class ThemeNotifier with ChangeNotifier {
   //ThemeData getTheme() =&gt; _themeData;
 
   ThemeNotifier() {
-    print('setting dark theme');
     if (globals.theme == 'DARK') {
+      print('setting dark theme');
       _themeData = darkTheme;
     } else {
       print('setting light theme');
