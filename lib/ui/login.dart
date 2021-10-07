@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mis_app/ui/admin_menu.dart';
+import 'package:mis_app/ui/view_advisor.dart';
 import 'package:provider/provider.dart';
 import 'package:mis_app/providers/theme_manager.dart';
 import 'package:mis_app/util/utility.dart';
@@ -23,7 +24,10 @@ class _LoginState extends State<Login> {
 
   bool passwordVisible = false;
   bool rememberMe = false;
-  _cancel() {}
+  _cancel() {
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (context) => ViewAdvisor()));
+  }
 
   _showHidePassword() {
     setState(() {
