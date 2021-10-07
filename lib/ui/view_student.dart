@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:mis_app/providers/theme_manager.dart';
 
-class ViewAdvisor extends StatefulWidget {
-  const ViewAdvisor({Key? key}) : super(key: key);
+class ViewStudent extends StatefulWidget {
+  const ViewStudent({Key? key}) : super(key: key);
 
   @override
-  _ViewAdvisorState createState() => _ViewAdvisorState();
+  _ViewStudentState createState() => _ViewStudentState();
 }
 
-class _ViewAdvisorState extends State<ViewAdvisor> {
+class _ViewStudentState extends State<ViewStudent> {
   Map<String, List<String>> classes = {
     'KAS 1': ['Name1 KAS 1', 'Name2 KAS 1', 'Name3 KAS 1'],
     'WIKA 1': ['Name1 WIKA 1', 'Name2 WIKA 1', 'Name3 WIKA 1'],
