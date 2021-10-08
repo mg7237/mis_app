@@ -16,14 +16,14 @@ class _ViewCourseState extends State<ViewCourse> {
   List<Map<String, String>> courses = [
     {
       'name': 'Kasaysayan 1',
-      'short_code': 'KAS 1',
-      'semester': '2021-2022',
-      'instructor': 'Doe, Jane B.',
+      'code': 'KAS 1',
+      'current_semester': '2021-2022',
+      'instructor_name': 'Doe, Jane B.',
       'units_count': '3'
     },
     {
       'name': 'Physical Fitness 1',
-      'short_code': 'PE 1',
+      'code': 'PE 1',
       'semester': '2021-2022',
       'instructor': 'Doe, John V.',
       'units_count': '5'
@@ -38,13 +38,13 @@ class _ViewCourseState extends State<ViewCourse> {
       'education_level': 'Undergraduate',
       'classes': [
         {
-          'short_code': 'KAS 1',
+          'code': 'KAS 1',
           'grade': '8.5',
           'grade_points': '8.345',
           'semester': '2021-2022',
         },
         {
-          'short_code': 'PE 1',
+          'code': 'PE 1',
           'grade': '4.5',
           'grade_points': '4.345',
           'semester': '2021-2022',
@@ -58,13 +58,13 @@ class _ViewCourseState extends State<ViewCourse> {
       'education_level': 'Undergraduate',
       'classes': [
         {
-          'short_code': 'KAS 1',
+          'code': 'KAS 1',
           'grade': '8.5',
           'grade_points': '8.345',
           'semester': '2021-2022',
         },
         {
-          'short_code': 'PE 1',
+          'code': 'PE 1',
           'grade': '4.5',
           'grade_points': '4.345',
           'semester': '2021-2022',
@@ -106,7 +106,7 @@ class _ViewCourseState extends State<ViewCourse> {
                         SizedBox(
                           height: 10,
                         ),
-                        Text(courses[0]['short_code'] ?? '',
+                        Text(courses[0]['code'] ?? '',
                             style: TextStyle(fontSize: 15)),
                         Row(children: [
                           Text('Semester', style: TextStyle(fontSize: 15)),

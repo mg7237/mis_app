@@ -4,14 +4,14 @@ import 'package:provider/provider.dart';
 import 'package:mis_app/providers/theme_manager.dart';
 import 'package:mis_app/models/student_model.dart';
 
-class ViewStudent extends StatefulWidget {
-  const ViewStudent({Key? key}) : super(key: key);
+class ViewCourseList extends StatefulWidget {
+  const ViewCourseList({Key? key}) : super(key: key);
 
   @override
-  _ViewStudentState createState() => _ViewStudentState();
+  _ViewCourseListState createState() => _ViewCourseListState();
 }
 
-class _ViewStudentState extends State<ViewStudent> {
+class _ViewCourseListState extends State<ViewCourseList> {
   late Student student;
   String _selectedSemester = 'Semester 1 2021-2022';
   List<String> semesters = [
@@ -25,6 +25,7 @@ class _ViewStudentState extends State<ViewStudent> {
 
   @override
   Widget build(BuildContext context) {
+    double width = (MediaQuery.of(context).size.width - 40);
     return Consumer<ThemeNotifier>(
         builder: (context, theme, _) => MaterialApp(
             theme: theme.getTheme(),
@@ -38,27 +39,8 @@ class _ViewStudentState extends State<ViewStudent> {
                       children: [
                         SizedBox(height: 20),
                         Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                  height: 70,
-                                  width: 70,
-                                  child: Image(
-                                    image: AssetImage(
-                                        'assets/icon/placeholder.jpg'),
-                                  )),
-                              SizedBox(width: 20),
-                              Text(
-                                'Moreno, Jerome A.',
-                                style: TextStyle(fontSize: 18),
-                              )
-                            ]),
-                        SizedBox(
-                          height: 30,
-                        ),
-                        Row(
                           children: [
-                            Text('Class Grades - ',
+                            Text('Courses - ',
                                 style: TextStyle(
                                   fontSize: 15,
                                 )),
@@ -107,6 +89,13 @@ class _ViewStudentState extends State<ViewStudent> {
                           height: 10,
                         ),
                         Table(
+                          columnWidths: {
+                            0: FixedColumnWidth(width * 15 / 100),
+                            1: FixedColumnWidth(width * 30 / 100),
+                            2: FixedColumnWidth(width * 15 / 100),
+                            3: FixedColumnWidth(width * 30 / 100),
+                            4: FixedColumnWidth(width * 10 / 100),
+                          },
                           children: [
                             TableRow(
                                 decoration: BoxDecoration(
@@ -114,56 +103,13 @@ class _ViewStudentState extends State<ViewStudent> {
                                     border: Border.all(width: 1.5)),
                                 children: [
                                   Container(
-                                    height: 30,
+                                    height: 40,
                                     decoration: BoxDecoration(
                                         border: Border(
                                             right: BorderSide(width: 1.5))),
                                     child: Center(
                                       child: Text(
-                                        'Class',
-                                        style: TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w600),
-                                      ),
-                                    ),
-                                  ),
-                                  // Container(
-                                  //   height: 30,
-                                  //   decoration: BoxDecoration(
-                                  //       border: Border(
-                                  //           right: BorderSide(width: 1.5))),
-                                  //   child: Center(
-                                  //     child: Text(
-                                  //       'Description',
-                                  //       style: TextStyle(
-                                  //           fontSize: 8,
-                                  //           fontWeight: FontWeight.bold),
-                                  //     ),
-                                  //   ),
-                                  // ),
-                                  // Container(
-                                  //   height: 30,
-                                  //   decoration: BoxDecoration(
-                                  //       border: Border(
-                                  //           right: BorderSide(width: 1.5))),
-                                  //   child: Center(
-                                  //     child: Text(
-                                  //       'Units',
-                                  //       style: TextStyle(
-                                  //           fontSize: 12,
-                                  //           fontWeight: FontWeight.w600),
-                                  //     ),
-                                  //   ),
-                                  // ),
-
-                                  Container(
-                                    height: 30,
-                                    decoration: BoxDecoration(
-                                        border: Border(
-                                            right: BorderSide(width: 1.5))),
-                                    child: Center(
-                                      child: Text(
-                                        'Grading',
+                                        'Course Code',
                                         style: TextStyle(
                                             fontSize: 12,
                                             fontWeight: FontWeight.w600),
@@ -171,13 +117,13 @@ class _ViewStudentState extends State<ViewStudent> {
                                     ),
                                   ),
                                   Container(
-                                    height: 30,
+                                    height: 40,
                                     decoration: BoxDecoration(
                                         border: Border(
                                             right: BorderSide(width: 1.5))),
                                     child: Center(
                                       child: Text(
-                                        'Grade',
+                                        'Course Name',
                                         style: TextStyle(
                                             fontSize: 12,
                                             fontWeight: FontWeight.w600),
@@ -185,18 +131,40 @@ class _ViewStudentState extends State<ViewStudent> {
                                     ),
                                   ),
                                   Container(
-                                    height: 30,
+                                    height: 40,
                                     decoration: BoxDecoration(
                                         border: Border(
                                             right: BorderSide(width: 1.5))),
                                     child: Center(
                                       child: Text(
-                                        'Grade Points',
+                                        'No. Of Units',
                                         style: TextStyle(
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.bold),
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600),
                                       ),
                                     ),
+                                  ),
+                                  Container(
+                                    height: 40,
+                                    decoration: BoxDecoration(
+                                        border: Border(
+                                            right: BorderSide(width: 1.5))),
+                                    child: Center(
+                                      child: Text(
+                                        'Advisor',
+                                        style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600),
+                                      ),
+                                    ),
+                                  ),
+                                  Container(
+                                    width: 30,
+                                    height: 40,
+                                    decoration: BoxDecoration(
+                                        border: Border(
+                                            right: BorderSide(width: 1.5))),
+                                    child: Center(),
                                   ),
                                 ]),
                             TableRow(
@@ -205,7 +173,7 @@ class _ViewStudentState extends State<ViewStudent> {
                                     border: Border.all(width: 1.5)),
                                 children: [
                                   Container(
-                                    height: 30,
+                                    height: 40,
                                     decoration: BoxDecoration(
                                         border: Border(
                                             right: BorderSide(width: 1.5))),
@@ -219,13 +187,27 @@ class _ViewStudentState extends State<ViewStudent> {
                                     ),
                                   ),
                                   Container(
-                                    height: 30,
+                                    height: 40,
                                     decoration: BoxDecoration(
                                         border: Border(
                                             right: BorderSide(width: 1.5))),
                                     child: Center(
                                       child: Text(
-                                        'A+',
+                                        'Kasa Yasaysayan',
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Container(
+                                    height: 40,
+                                    decoration: BoxDecoration(
+                                        border: Border(
+                                            right: BorderSide(width: 1.5))),
+                                    child: Center(
+                                      child: Text(
+                                        '3',
                                         style: TextStyle(
                                           fontSize: 12,
                                         ),
@@ -233,13 +215,13 @@ class _ViewStudentState extends State<ViewStudent> {
                                     ),
                                   ),
                                   Container(
-                                    height: 30,
+                                    height: 40,
                                     decoration: BoxDecoration(
                                         border: Border(
                                             right: BorderSide(width: 1.5))),
                                     child: Center(
                                       child: Text(
-                                        '8.9',
+                                        'Jon, Doe',
                                         style: TextStyle(
                                           fontSize: 12,
                                         ),
@@ -247,18 +229,16 @@ class _ViewStudentState extends State<ViewStudent> {
                                     ),
                                   ),
                                   Container(
-                                    height: 30,
+                                    height: 40,
+                                    width: 40,
                                     decoration: BoxDecoration(
                                         border: Border(
                                             right: BorderSide(width: 1.5))),
                                     child: Center(
-                                      child: Text(
-                                        '8.94',
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ),
+                                        child: IconButton(
+                                            onPressed: () {},
+                                            icon: Icon(Icons
+                                                .arrow_forward_ios_sharp))),
                                   ),
                                 ]),
                             TableRow(
@@ -267,7 +247,7 @@ class _ViewStudentState extends State<ViewStudent> {
                                     border: Border.all(width: 1.5)),
                                 children: [
                                   Container(
-                                    height: 30,
+                                    height: 40,
                                     decoration: BoxDecoration(
                                         border: Border(
                                             right: BorderSide(width: 1.5))),
@@ -281,13 +261,27 @@ class _ViewStudentState extends State<ViewStudent> {
                                     ),
                                   ),
                                   Container(
-                                    height: 30,
+                                    height: 40,
                                     decoration: BoxDecoration(
                                         border: Border(
                                             right: BorderSide(width: 1.5))),
                                     child: Center(
                                       child: Text(
-                                        'B++',
+                                        'Physical Education',
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Container(
+                                    height: 40,
+                                    decoration: BoxDecoration(
+                                        border: Border(
+                                            right: BorderSide(width: 1.5))),
+                                    child: Center(
+                                      child: Text(
+                                        '5',
                                         style: TextStyle(
                                           fontSize: 12,
                                         ),
@@ -295,13 +289,13 @@ class _ViewStudentState extends State<ViewStudent> {
                                     ),
                                   ),
                                   Container(
-                                    height: 30,
+                                    height: 40,
                                     decoration: BoxDecoration(
                                         border: Border(
                                             right: BorderSide(width: 1.5))),
                                     child: Center(
                                       child: Text(
-                                        '7.645',
+                                        'Jane, Doe',
                                         style: TextStyle(
                                           fontSize: 12,
                                         ),
@@ -309,18 +303,16 @@ class _ViewStudentState extends State<ViewStudent> {
                                     ),
                                   ),
                                   Container(
-                                    height: 30,
+                                    height: 40,
+                                    width: 40,
                                     decoration: BoxDecoration(
                                         border: Border(
                                             right: BorderSide(width: 1.5))),
                                     child: Center(
-                                      child: Text(
-                                        '8.94',
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ),
+                                        child: IconButton(
+                                            onPressed: () {},
+                                            icon: Icon(Icons
+                                                .arrow_forward_ios_sharp))),
                                   ),
                                 ])
                           ],

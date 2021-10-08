@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:mis_app/ui/admin_menu.dart';
 import 'package:mis_app/ui/view_advisor.dart';
 import 'package:mis_app/ui/view_course.dart';
+import 'package:mis_app/ui/view_course_list.dart';
+import 'package:mis_app/ui/view_student.dart';
+import 'package:mis_app/ui/register_student.dart';
 import 'package:provider/provider.dart';
 import 'package:mis_app/providers/theme_manager.dart';
 import 'package:mis_app/util/utility.dart';
@@ -28,8 +31,12 @@ class _LoginState extends State<Login> {
   _cancel() {
     // Navigator.pushReplacement(
     //     context, MaterialPageRoute(builder: (context) => ViewAdvisor()));
+    // Navigator.pushReplacement(
+    //     context, MaterialPageRoute(builder: (context) => ViewCourse()));
+    // Navigator.pushReplacement(
+    //     context, MaterialPageRoute(builder: (context) => ViewStudent()));
     Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) => ViewCourse()));
+        context, MaterialPageRoute(builder: (context) => ViewCourseList()));
   }
 
   _showHidePassword() {
@@ -239,12 +246,20 @@ class _LoginState extends State<Login> {
                           height: 30,
                         ),
                         Center(
-                          child: Text(
-                            'Register',
-                            style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.blue[800],
-                                decoration: TextDecoration.underline),
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => RegisterSudent()));
+                            },
+                            child: Text(
+                              'Register',
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.blue[800],
+                                  decoration: TextDecoration.underline),
+                            ),
                           ),
                         ),
                         SizedBox(
