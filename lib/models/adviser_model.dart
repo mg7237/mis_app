@@ -1,4 +1,4 @@
-class Advisor {
+class Adviser {
   String? id;
   String firstName;
   String lastName;
@@ -6,7 +6,7 @@ class Advisor {
   String photoURL;
   List<String> classes;
 
-  Advisor(
+  Adviser(
       {this.id,
       required this.firstName,
       required this.lastName,

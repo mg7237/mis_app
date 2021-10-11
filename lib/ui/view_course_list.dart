@@ -151,7 +151,7 @@ class _ViewCourseListState extends State<ViewCourseList> {
                                             right: BorderSide(width: 1.5))),
                                     child: Center(
                                       child: Text(
-                                        'Advisor',
+                                        'Adviser',
                                         style: TextStyle(
                                             fontSize: 12,
                                             fontWeight: FontWeight.w600),

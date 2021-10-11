@@ -13,12 +13,50 @@ class RegisterSudent extends StatefulWidget {
 }
 
 class _RegisterSudentState extends State<RegisterSudent> {
-  Map<String, List<String>> classes = {
-    'KAS 1': ['Name1 KAS 1', 'Name2 KAS 1', 'Name3 KAS 1'],
-    'WIKA 1': ['Name1 WIKA 1', 'Name2 WIKA 1', 'Name3 WIKA 1'],
-    'ETHICS 1': ['Name1 ETHICS 1', 'Name2 ETHICS 1', 'Name3 ETHICS 1'],
-    'PE 1': ['Name1 PE 1', 'Name2 PE 1', 'Name3 PE 1'],
-    'See all students': [],
+  String? _selectedAcademicLevel;
+  String? _selectedFaculty;
+  String? _selectedCourse;
+  List<DropdownMenuItem<String>> facultyList = [];
+  List<DropdownMenuItem<String>> courseList = [];
+
+  Map<String, Map<String, List<String>>> academicData = {
+    'Under Graduate': {
+      'Faculty of Education': [
+        'Associate in arts',
+        'Bachelor of Education Studies'
+      ],
+      'Faculty of Information & Communication Studies': [
+        'Bachelor of Arts in Multimedia Studies'
+      ]
+    },
+    'Graduate': {
+      'Faculty of Education': [
+        'Graduate Certificate Faculty of Education Graduate Certificate in Distance Education'
+      ],
+      'Faculty of Management & Development Studies': [
+        'Graduate Certificate in ASEAN Studies'
+      ]
+    },
+    'Diploma': {
+      'Faculty of Education': [
+        'Diploma in Science Teaching',
+        'Diploma in Mathematics Teaching',
+        'Diploma in Language and Literacy Education',
+        'Diploma in Social Studies Education'
+      ],
+      'Faculty of Management & Development Studies': [
+        'Diploma in Environment and Natural Resource Management',
+        'Diploma in International Health',
+        'Diploma in Land Valuation and Management',
+        'Diploma in Research and Development Management',
+        'Diploma in Land Use Planning',
+        'Diploma in Social Work',
+        'Diploma in Women and Development'
+      ],
+      'Faculty of Information & Communication Studies': [
+        'Diploma in Computer Science'
+      ],
+    },
   };
 
   XFile? image;
@@ -37,6 +75,29 @@ class _RegisterSudentState extends State<RegisterSudent> {
     } else {
       getImage(false);
     }
+  }
+
+  void updateFacultyDropdown(String? selectedAcademicLevel) {
+    if (selectedAcademicLevel == null) return;
+    List<String> faculties = academicData[selectedAcademicLevel]!.keys.toList();
+    faculties.forEach((element) {
+      facultyList.add(DropdownMenuItem(
+          child: Text(element,
+              overflow: TextOverflow.fade, style: TextStyle(fontSize: 14)),
+          value: element));
+    });
+  }
+
+  void updateCourseDropdown(String? selectedFaculty) {
+    if (selectedFaculty == null) return;
+    List<String>? courses =
+        academicData[_selectedAcademicLevel]![selectedFaculty];
+    courses?.forEach((element) {
+      courseList.add(DropdownMenuItem(
+          child: Text(element,
+              overflow: TextOverflow.fade, style: TextStyle(fontSize: 14)),
+          value: element));
+    });
   }
 
   Future getImage(bool result) async {
@@ -81,11 +142,11 @@ class _RegisterSudentState extends State<RegisterSudent> {
                           Column(
                             children: [
                               Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     Container(
-                                        height: 70,
-                                        width: 70,
+                                        height: 100,
+                                        width: 100,
                                         child: InkWell(
                                             child: Image(
                                                 image: AssetImage(
@@ -98,7 +159,7 @@ class _RegisterSudentState extends State<RegisterSudent> {
                                                   builder: (context) {
                                                     return CupertinoActionSheet(
                                                       title: Text(
-                                                        'Select Image',
+                                                        ' Image',
                                                         style: TextStyle(
                                                             fontSize: 20,
                                                             color: Colors.grey),
@@ -106,7 +167,7 @@ class _RegisterSudentState extends State<RegisterSudent> {
                                                       actions: <Widget>[
                                                         CupertinoActionSheetAction(
                                                           child: Text(
-                                                              "Select from Camera"),
+                                                              " from Camera"),
                                                           onPressed: () async {
                                                             checkCameraPermission =
                                                                 true;
@@ -118,7 +179,7 @@ class _RegisterSudentState extends State<RegisterSudent> {
                                                         ),
                                                         CupertinoActionSheetAction(
                                                           child: Text(
-                                                              "Select from Gallery"),
+                                                              " from Gallery"),
                                                           onPressed: () async {
                                                             checkPermission(
                                                                 false);
@@ -130,33 +191,159 @@ class _RegisterSudentState extends State<RegisterSudent> {
                                                     );
                                                   });
                                             })),
-                                    SizedBox(width: 20),
-                                    Container(
-                                      width: 200,
-                                      height: 40,
-                                      child: TextFormField(
-                                        decoration: InputDecoration(
-                                            hintText: 'Student Number'),
-                                        controller: studentNumberController,
-                                        style: TextStyle(fontSize: 16),
-                                        validator: (String? value) {
-                                          if (value == null || value == '') {
-                                            return 'Please enter Student Number';
-                                          }
-                                        },
+                                    Padding(
+                                      padding:
+                                          const EdgeInsets.only(left: 20.0),
+                                      child: Column(
+                                        children: [
+                                          Container(
+                                            width: 220,
+                                            height: 30,
+                                            child: TextFormField(
+                                              decoration: InputDecoration(
+                                                  hintText: 'Student Number'),
+                                              controller:
+                                                  studentNumberController,
+                                              style: TextStyle(fontSize: 14),
+                                              keyboardType:
+                                                  TextInputType.number,
+                                              validator: (String? value) {
+                                                if (value == null ||
+                                                    value == '') {
+                                                  return 'Please enter Student Number';
+                                                }
+                                              },
+                                            ),
+                                          ),
+                                          Container(
+                                            width: 220,
+                                            height: 40,
+                                            child: TextFormField(
+                                              decoration: InputDecoration(
+                                                  hintText: 'Last Name'),
+                                              controller: lastNameController,
+                                              style: TextStyle(fontSize: 14),
+                                              keyboardType: TextInputType.name,
+                                              validator: (String? value) {
+                                                if (value == null ||
+                                                    value == '') {
+                                                  return 'Please enter Last Name';
+                                                }
+                                              },
+                                            ),
+                                          ),
+                                          Container(
+                                            width: 220,
+                                            height: 40,
+                                            child: TextFormField(
+                                              decoration: InputDecoration(
+                                                  hintText: 'First Name'),
+                                              controller: firstNameController,
+                                              style: TextStyle(fontSize: 14),
+                                              keyboardType: TextInputType.name,
+                                              validator: (String? value) {
+                                                if (value == null ||
+                                                    value == '') {
+                                                  return 'Please enter First Name';
+                                                }
+                                              },
+                                            ),
+                                          ),
+                                          Container(
+                                            width: 220,
+                                            height: 40,
+                                            child: TextFormField(
+                                              decoration: InputDecoration(
+                                                  hintText: 'Middle Initial'),
+                                              controller: middleNameController,
+                                              style: TextStyle(fontSize: 14),
+                                              keyboardType: TextInputType.name,
+                                            ),
+                                          )
+                                        ],
                                       ),
-                                    )
+                                    ),
                                   ]),
                             ],
                           ),
                           SizedBox(
-                            height: 40,
+                            height: 20,
                           ),
-                          Text('Classes',
-                              style: TextStyle(
-                                  fontSize: 28, fontWeight: FontWeight.bold)),
+                          Container(
+                            padding: EdgeInsets.only(right: 10),
+                            width: MediaQuery.of(context).size.width,
+                            child: DropdownButtonFormField(
+                                value: _selectedAcademicLevel,
+                                onChanged: (String? value) {
+                                  _selectedAcademicLevel = value;
+                                  updateFacultyDropdown(_selectedAcademicLevel);
+                                  _selectedFaculty = null;
+                                  _selectedCourse = null;
+                                  setState(() {});
+                                },
+                                hint: Text('Select Academic Level'),
+                                items: [
+                                  DropdownMenuItem(
+                                    child: Text(
+                                      academicData.keys.toList()[0],
+                                      style: TextStyle(fontSize: 14),
+                                    ),
+                                    value: academicData.keys.toList()[0],
+                                  ),
+                                  DropdownMenuItem(
+                                      child: Text(academicData.keys.toList()[1],
+                                          style: TextStyle(fontSize: 14)),
+                                      value: academicData.keys.toList()[1]),
+                                  DropdownMenuItem(
+                                      child: Text(academicData.keys.toList()[2],
+                                          style: TextStyle(fontSize: 14)),
+                                      value: academicData.keys.toList()[2])
+                                ]),
+                          ),
+                          Container(
+                            padding: EdgeInsets.only(right: 10),
+                            width: MediaQuery.of(context).size.width,
+                            child: DropdownButtonFormField<String>(
+                                hint: Text('Select Faculty'),
+                                isExpanded: true,
+                                value: _selectedFaculty,
+                                onChanged: (String? value) {
+                                  _selectedFaculty = value ?? '';
+                                  updateCourseDropdown(_selectedFaculty);
+                                  setState(() {});
+                                },
+                                items: facultyList),
+                          ),
+                          Container(
+                            padding: EdgeInsets.only(right: 10),
+                            width: MediaQuery.of(context).size.width,
+                            child: DropdownButtonFormField(
+                                hint: Text('Select Program'),
+                                isExpanded: true,
+                                value: _selectedCourse,
+                                onChanged: (String? value) {
+                                  _selectedCourse = value ?? '';
+                                  setState(() {});
+                                },
+                                items: courseList),
+                          ),
                           SizedBox(
                             height: 20,
+                          ),
+                          Container(
+                            height: 30,
+                            padding: EdgeInsets.only(right: 10),
+                            child: TextFormField(
+                              decoration: InputDecoration(hintText: 'Adviser'),
+                              controller: studentNumberController,
+                              style: TextStyle(fontSize: 14),
+                              keyboardType: TextInputType.number,
+                              validator: (String? value) {
+                                if (value == null || value == '') {
+                                  return 'Please enter Adviser';
+                                }
+                              },
+                            ),
                           ),
                         ],
                       ),

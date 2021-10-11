@@ -1,43 +1,52 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mis_app/ui/admin_menu.dart';
-import 'package:mis_app/ui/forgot_password.dart';
 import 'package:mis_app/ui/view_adviser.dart';
 import 'package:mis_app/ui/view_course.dart';
 import 'package:mis_app/ui/view_course_list.dart';
-import 'package:mis_app/ui/view_student.dart';
+import 'package:mis_app/ui/login.dart';
 import 'package:mis_app/ui/register_student.dart';
 import 'package:provider/provider.dart';
 import 'package:mis_app/providers/theme_manager.dart';
 import 'package:mis_app/util/utility.dart';
 import 'package:mis_app/widgets/ensure_visible.dart';
 
-class Login extends StatefulWidget {
+class ChangePassword extends StatefulWidget {
   @override
-  _LoginState createState() => _LoginState();
+  _ChangePasswordState createState() => _ChangePasswordState();
 }
 
-class _LoginState extends State<Login> {
+class _ChangePasswordState extends State<ChangePassword> {
   final FocusNode _focusNodeUserId = FocusNode();
   final FocusNode _focusNodePassword = FocusNode();
-  final FocusNode _focusNodeLoginBtn = FocusNode();
+  final FocusNode _focusNodePasswordConfirm = FocusNode();
+  final FocusNode _focusNodeChangePasswordBtn = FocusNode();
 
   static final TextEditingController _userIdController =
       TextEditingController();
   static final TextEditingController _passwordController =
       TextEditingController();
 
+  static final TextEditingController _confirmPasswordController =
+      TextEditingController();
+
   bool passwordVisible = false;
   bool rememberMe = false;
+  bool confirmPasswordVisible = false;
+
   _cancel() {
-    _userIdController.text = '';
-    _passwordController.text = '';
-    setState(() {});
+    Navigator.of(context).maybePop();
   }
 
   _showHidePassword() {
     setState(() {
       passwordVisible = !passwordVisible;
+    });
+  }
+
+  _showHideConfirmPassword() {
+    setState(() {
+      confirmPasswordVisible = !confirmPasswordVisible;
     });
   }
 
@@ -58,12 +67,9 @@ class _LoginState extends State<Login> {
               child: SingleChildScrollView(
                   child: Column(
                 children: [
-                  Container(
-                      width: MediaQuery.of(context).size.width - 100,
-                      height: MediaQuery.of(context).size.width - 100,
-                      child: Center(
-                          child: Image(
-                              image: AssetImage('assets/icon/app_logo.png')))),
+                  SizedBox(
+                    height: 20,
+                  ),
                   Container(
                     width: double.infinity,
                     child: Column(
@@ -146,7 +152,7 @@ class _LoginState extends State<Login> {
                                 textInputAction: TextInputAction.next,
                                 onFieldSubmitted: (value) {
                                   fieldFocusChange(context, _focusNodePassword,
-                                      _focusNodeLoginBtn);
+                                      _focusNodeChangePasswordBtn);
                                 },
                               ),
                               Positioned(
@@ -169,28 +175,66 @@ class _LoginState extends State<Login> {
                                 ),
                               )
                             ])),
-                        SizedBox(height: 10),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 15),
-                          child: Row(
-                            children: [
-                              Checkbox(
-                                  value: rememberMe,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      rememberMe = value ?? false;
-                                    });
-                                  }),
-                              SizedBox(
-                                width: 10,
+                        SizedBox(height: 20),
+                        Container(
+                            width: MediaQuery.of(context).size.width - 50,
+                            height: 50,
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10))),
+                            child: Stack(children: [
+                              TextFormField(
+                                style: TextStyle(fontSize: 18),
+                                //enabled: !showLoader,
+                                decoration: const InputDecoration(
+                                  border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(10.0))),
+                                  hintText: 'Confirm Password',
+                                  hintStyle: TextStyle(color: Colors.black),
+                                ),
+
+                                // onSaved: (value) =>
+                                //     _loginRequestModel.email = value,
+                                //validator: _loginRequestModel.emailValidate,
+                                validator: (value) {
+                                  if ((value ?? '') != '') {
+                                    return null;
+                                  } else
+                                    return 'Enter Password';
+                                },
+                                controller: _confirmPasswordController,
+                                focusNode: _focusNodePasswordConfirm,
+                                keyboardType: TextInputType.visiblePassword,
+                                obscureText: !confirmPasswordVisible,
+                                textInputAction: TextInputAction.next,
+                                onFieldSubmitted: (value) {
+                                  fieldFocusChange(context, _focusNodePassword,
+                                      _focusNodeChangePasswordBtn);
+                                },
                               ),
-                              Text(
-                                'Remember Me?',
-                                style: TextStyle(fontSize: 14),
+                              Positioned(
+                                right: 20,
+                                top: 10,
+                                child: InkWell(
+                                  onTap: () {
+                                    _showHideConfirmPassword();
+                                  },
+                                  child: Container(
+                                      height: 30,
+                                      width: 30,
+                                      child: Image(
+                                        image: confirmPasswordVisible
+                                            ? AssetImage(
+                                                'assets/icon/close_visibility.png')
+                                            : AssetImage(
+                                                'assets/icon/open_visibility.png'),
+                                      )),
+                                ),
                               )
-                            ],
-                          ),
-                        ),
+                            ])),
+                        SizedBox(height: 10),
                         SizedBox(height: 30),
                         Container(
                           width: MediaQuery.of(context).size.width - 50,
@@ -210,7 +254,7 @@ class _LoginState extends State<Login> {
                                       child: Text(
                                         'Cancel',
                                         style: TextStyle(
-                                            fontSize: 16, color: Colors.white),
+                                            fontSize: 14, color: Colors.white),
                                       ),
                                     ),
                                     onTap: () => _cancel(),
@@ -225,12 +269,12 @@ class _LoginState extends State<Login> {
                                       borderRadius: BorderRadius.all(
                                           Radius.circular(10))),
                                   child: InkWell(
-                                    focusNode: _focusNodeLoginBtn,
+                                    focusNode: _focusNodeChangePasswordBtn,
                                     child: Center(
                                       child: Text(
-                                        'Login',
+                                        'Change Password',
                                         style: TextStyle(
-                                            fontSize: 16, color: Colors.white),
+                                            fontSize: 14, color: Colors.white),
                                       ),
                                     ),
                                     onTap: () => _login(),
@@ -238,44 +282,6 @@ class _LoginState extends State<Login> {
                             ],
                           ),
                         ),
-                        SizedBox(
-                          height: 30,
-                        ),
-                        Center(
-                          child: InkWell(
-                            onTap: () {
-                              Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => RegisterSudent()));
-                            },
-                            child: Text(
-                              'Register',
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.blue[800],
-                                  decoration: TextDecoration.underline),
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Center(
-                          child: InkWell(
-                            onTap: () {
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => ChangePassword()));
-                            },
-                            child: Text(
-                              'Forgot Username & Password',
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.blue[800],
-                                  decoration: TextDecoration.underline),
-                            ),
-                          ),
-                        )
                       ],
                     ),
                   ),
