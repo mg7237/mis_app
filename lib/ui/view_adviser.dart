@@ -81,7 +81,7 @@ class _ViewAdviserState extends State<ViewAdviser> {
                                           MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(classes.keys.elementAt(i),
-                                            style: TextStyle(fontSize: 18)),
+                                            style: TextStyle(fontSize: 16)),
                                         IconButton(
                                             icon: expandedIndex == i
                                                 ? Icon(
@@ -110,7 +110,7 @@ class _ViewAdviserState extends State<ViewAdviser> {
                                                       classes.values
                                                           .elementAt(i)[j],
                                                       style: TextStyle(
-                                                          fontSize: 15),
+                                                          fontSize: 14),
                                                     ),
                                                   );
                                                 }),

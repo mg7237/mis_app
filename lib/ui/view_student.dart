@@ -204,16 +204,55 @@ class _ViewStudentState extends State<ViewStudent> {
                                     // color: Colors.grey[300],
                                     border: Border.all(width: 1.5)),
                                 children: [
-                                  Container(
-                                    height: 30,
-                                    decoration: BoxDecoration(
-                                        border: Border(
-                                            right: BorderSide(width: 1.5))),
-                                    child: Center(
-                                      child: Text(
-                                        'KAS 1',
-                                        style: TextStyle(
-                                          fontSize: 12,
+                                  InkWell(
+                                    onTap: () {
+                                      showDialog(
+                                          context: context,
+                                          builder: (BuildContext context) =>
+                                              new AlertDialog(
+                                                backgroundColor: Colors.blue,
+                                                title:
+                                                    new Text('Course Details'),
+                                                content: Container(
+                                                  height: 150,
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                          'Course Name: Kasasysayan 1'),
+                                                      SizedBox(
+                                                        height: 20,
+                                                      ),
+                                                      Text(
+                                                          'Number of units: 5'),
+                                                    ],
+                                                  ),
+                                                ),
+                                                actions: <Widget>[
+                                                  new IconButton(
+                                                      icon:
+                                                          new Icon(Icons.close),
+                                                      onPressed: () {
+                                                        Navigator.pop(context);
+                                                      })
+                                                ],
+                                              ));
+                                    },
+                                    child: Container(
+                                      height: 30,
+                                      decoration: BoxDecoration(
+                                          border: Border(
+                                              right: BorderSide(width: 1.5))),
+                                      child: Center(
+                                        child: Text(
+                                          'KAS 1',
+                                          style: TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.blue[800],
+                                              decoration:
+                                                  TextDecoration.underline),
                                         ),
                                       ),
                                     ),
@@ -266,16 +305,55 @@ class _ViewStudentState extends State<ViewStudent> {
                                     // color: Colors.grey[300],
                                     border: Border.all(width: 1.5)),
                                 children: [
-                                  Container(
-                                    height: 30,
-                                    decoration: BoxDecoration(
-                                        border: Border(
-                                            right: BorderSide(width: 1.5))),
-                                    child: Center(
-                                      child: Text(
-                                        'PE 1',
-                                        style: TextStyle(
-                                          fontSize: 12,
+                                  InkWell(
+                                    onTap: () async {
+                                      showDialog(
+                                          context: context,
+                                          builder: (BuildContext context) =>
+                                              new AlertDialog(
+                                                backgroundColor: Colors.blue,
+                                                title:
+                                                    new Text('Course Details'),
+                                                content: Container(
+                                                  height: 150,
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                          'Course Name: Physical Education'),
+                                                      SizedBox(
+                                                        height: 20,
+                                                      ),
+                                                      Text(
+                                                          'Number of units: 1'),
+                                                    ],
+                                                  ),
+                                                ),
+                                                actions: <Widget>[
+                                                  new IconButton(
+                                                      icon:
+                                                          new Icon(Icons.close),
+                                                      onPressed: () {
+                                                        Navigator.pop(context);
+                                                      })
+                                                ],
+                                              ));
+                                    },
+                                    child: Container(
+                                      height: 30,
+                                      decoration: BoxDecoration(
+                                          border: Border(
+                                              right: BorderSide(width: 1.5))),
+                                      child: Center(
+                                        child: Text(
+                                          'PE 1',
+                                          style: TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.blue[800],
+                                              decoration:
+                                                  TextDecoration.underline),
                                         ),
                                       ),
                                     ),

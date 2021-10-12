@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:mis_app/ui/view_course.dart';
 import 'package:provider/provider.dart';
 import 'package:mis_app/providers/theme_manager.dart';
 import 'package:mis_app/models/student_model.dart';
@@ -37,6 +38,10 @@ class _ViewCourseListState extends State<ViewCourseList> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        SizedBox(height: 20),
+                        Text('Courses',
+                            style: TextStyle(
+                                fontSize: 28, fontWeight: FontWeight.bold)),
                         SizedBox(height: 20),
                         Row(
                           children: [
@@ -236,7 +241,11 @@ class _ViewCourseListState extends State<ViewCourseList> {
                                             right: BorderSide(width: 1.5))),
                                     child: Center(
                                         child: IconButton(
-                                            onPressed: () {},
+                                            onPressed: () =>
+                                                Navigator.of(context).push(
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            ViewCourse())),
                                             icon: Icon(Icons
                                                 .arrow_forward_ios_sharp))),
                                   ),
@@ -310,7 +319,11 @@ class _ViewCourseListState extends State<ViewCourseList> {
                                             right: BorderSide(width: 1.5))),
                                     child: Center(
                                         child: IconButton(
-                                            onPressed: () {},
+                                            onPressed: () =>
+                                                Navigator.of(context).push(
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            ViewCourse())),
                                             icon: Icon(Icons
                                                 .arrow_forward_ios_sharp))),
                                   ),

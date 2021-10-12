@@ -1,22 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:mis_app/providers/theme_manager.dart';
-
 import 'package:flutter/cupertino.dart';
-import 'package:mis_app/ui/admin_menu.dart';
-
 import 'package:mis_app/ui/add_adviser.dart';
 import 'package:mis_app/ui/add_admin.dart';
 import 'package:mis_app/ui/add_course.dart';
 import 'package:mis_app/ui/register_student.dart';
 
-import 'package:mis_app/ui/view_adviser.dart';
-import 'package:mis_app/ui/view_admin.dart';
+import 'package:mis_app/ui/view_adviser_list.dart';
+import 'package:mis_app/ui/view_admin_list.dart';
 import 'package:mis_app/ui/view_course_list.dart';
 import 'package:mis_app/ui/view_student.dart';
 
 import 'package:provider/provider.dart';
-import 'package:mis_app/util/utility.dart';
-import 'package:mis_app/widgets/ensure_visible.dart';
 
 class AdminMenu extends StatefulWidget {
   const AdminMenu({Key? key}) : super(key: key);
@@ -51,10 +46,10 @@ class _AdminMenuState extends State<AdminMenu> {
           context, MaterialPageRoute(builder: (context) => RegisterSudent()));
     } else if (buttonName == 'ViewAdvisersBtn') {
       Navigator.push(
-          context, MaterialPageRoute(builder: (context) => ViewAdviser()));
+          context, MaterialPageRoute(builder: (context) => AdviserList()));
     } else if (buttonName == 'ViewAdminsBtn') {
       Navigator.push(
-          context, MaterialPageRoute(builder: (context) => ViewAdmin()));
+          context, MaterialPageRoute(builder: (context) => AdminList()));
     } else if (buttonName == 'ViewCoursesBtn') {
       Navigator.push(
           context, MaterialPageRoute(builder: (context) => ViewCourseList()));
