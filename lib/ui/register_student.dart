@@ -1,5 +1,5 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:date_time_picker/date_time_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:mis_app/providers/theme_manager.dart';
 import 'package:image_picker/image_picker.dart';
@@ -18,6 +18,8 @@ class _RegisterSudentState extends State<RegisterSudent> {
   String? _selectedCourse;
   List<DropdownMenuItem<String>> facultyList = [];
   List<DropdownMenuItem<String>> courseList = [];
+  List<String> advisers = ['John Doe', 'Jack Doe', 'Jane Doe'];
+  String? _selectedAdviser;
 
   Map<String, Map<String, List<String>>> academicData = {
     'Under Graduate': {
@@ -68,6 +70,13 @@ class _RegisterSudentState extends State<RegisterSudent> {
   TextEditingController facultyController = TextEditingController();
   TextEditingController programController = TextEditingController();
   TextEditingController advisorController = TextEditingController();
+  TextEditingController dobController = TextEditingController();
+  String _dateLabelText = 'Date of Birth';
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   checkPermission(bool result) async {
     if (result) {
@@ -259,7 +268,39 @@ class _RegisterSudentState extends State<RegisterSudent> {
                                               style: TextStyle(fontSize: 14),
                                               keyboardType: TextInputType.name,
                                             ),
-                                          )
+                                          ),
+                                          Container(
+                                            height: 40,
+                                            width: 220,
+                                            padding: EdgeInsets.only(right: 10),
+                                            child: DateTimePicker(
+                                              calendarTitle:
+                                                  'Select Date of Birth',
+                                              type: DateTimePickerType.date,
+                                              dateMask: 'dd MMM, yyyy',
+                                              initialDate: DateTime(2000),
+                                              initialValue: '',
+                                              style: TextStyle(fontSize: 14),
+                                              firstDate: DateTime(1950),
+                                              lastDate: DateTime(2010),
+                                              icon: Icon(Icons.event),
+                                              dateLabelText: _dateLabelText,
+                                              onChanged: (val) {
+                                                if (val != '') {
+                                                  _dateLabelText = '';
+                                                } else {
+                                                  _dateLabelText =
+                                                      'Date of Birth';
+                                                }
+                                                setState(() {});
+                                              },
+                                              validator: (val) {
+                                                print(val);
+                                                return null;
+                                              },
+                                              onSaved: (val) => print(val),
+                                            ),
+                                          ),
                                         ],
                                       ),
                                     ),
@@ -281,7 +322,8 @@ class _RegisterSudentState extends State<RegisterSudent> {
                                   _selectedCourse = null;
                                   setState(() {});
                                 },
-                                hint: Text('Select Academic Level'),
+                                hint: Text('Select Academic Level',
+                                    style: TextStyle(fontSize: 14)),
                                 items: [
                                   DropdownMenuItem(
                                     child: Text(
@@ -304,7 +346,8 @@ class _RegisterSudentState extends State<RegisterSudent> {
                             padding: EdgeInsets.only(right: 10),
                             width: MediaQuery.of(context).size.width,
                             child: DropdownButtonFormField<String>(
-                                hint: Text('Select Faculty'),
+                                hint: Text('Select Faculty',
+                                    style: TextStyle(fontSize: 14)),
                                 isExpanded: true,
                                 value: _selectedFaculty,
                                 onChanged: (String? value) {
@@ -318,7 +361,8 @@ class _RegisterSudentState extends State<RegisterSudent> {
                             padding: EdgeInsets.only(right: 10),
                             width: MediaQuery.of(context).size.width,
                             child: DropdownButtonFormField(
-                                hint: Text('Select Program'),
+                                hint: Text('Select Program',
+                                    style: TextStyle(fontSize: 14)),
                                 isExpanded: true,
                                 value: _selectedCourse,
                                 onChanged: (String? value) {
@@ -327,22 +371,82 @@ class _RegisterSudentState extends State<RegisterSudent> {
                                 },
                                 items: courseList),
                           ),
-                          SizedBox(
-                            height: 20,
-                          ),
+                          SizedBox(height: 10),
                           Container(
-                            height: 30,
                             padding: EdgeInsets.only(right: 10),
-                            child: TextFormField(
-                              decoration: InputDecoration(hintText: 'Adviser'),
-                              controller: studentNumberController,
-                              style: TextStyle(fontSize: 14),
-                              keyboardType: TextInputType.number,
-                              validator: (String? value) {
-                                if (value == null || value == '') {
-                                  return 'Please enter Adviser';
-                                }
-                              },
+                            width: MediaQuery.of(context).size.width,
+                            child: DropdownButtonFormField(
+                                value: _selectedAdviser,
+                                onChanged: (String? value) {
+                                  _selectedAdviser = value;
+                                  setState(() {});
+                                },
+                                hint: Text('Select Adviser',
+                                    style: TextStyle(fontSize: 14)),
+                                items: [
+                                  DropdownMenuItem(
+                                    child: Text(
+                                      advisers[0],
+                                      style: TextStyle(fontSize: 14),
+                                    ),
+                                    value: academicData.keys.toList()[0],
+                                  ),
+                                  DropdownMenuItem(
+                                      child: Text(advisers[1],
+                                          style: TextStyle(fontSize: 14)),
+                                      value: advisers[1]),
+                                  DropdownMenuItem(
+                                      child: Text(advisers[2],
+                                          style: TextStyle(fontSize: 14)),
+                                      value: advisers[2])
+                                ]),
+                          ),
+                          SizedBox(height: 30),
+                          Container(
+                            width: MediaQuery.of(context).size.width - 50,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Container(
+                                    height: 50,
+                                    width: 160,
+                                    decoration: BoxDecoration(
+                                        color: Colors.blue,
+                                        border: Border.all(width: 1),
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(10))),
+                                    child: InkWell(
+                                      child: Center(
+                                        child: Text(
+                                          'Cancel',
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              color: Colors.white),
+                                        ),
+                                      ),
+                                      onTap: () {},
+                                    )),
+                                SizedBox(width: 20),
+                                Container(
+                                    height: 50,
+                                    width: 160,
+                                    decoration: BoxDecoration(
+                                        color: Colors.blue,
+                                        border: Border.all(width: 1),
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(10))),
+                                    child: InkWell(
+                                      child: Center(
+                                        child: Text(
+                                          'Register',
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              color: Colors.white),
+                                        ),
+                                      ),
+                                      onTap: () => {},
+                                    )),
+                              ],
                             ),
                           ),
                         ],

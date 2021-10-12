@@ -31,11 +31,11 @@ class ThemeNotifier with ChangeNotifier {
     brightness: Brightness.light,
     backgroundColor: Colors.white,
     colorScheme: ColorScheme(
-        onPrimary: Colors.blue,
+        onPrimary: Colors.white,
         primary: Colors.blue,
         primaryVariant: Colors.blue,
         background: Colors.white,
-        onBackground: Colors.white,
+        onBackground: Colors.black,
         onSurface: Colors.black,
         secondary: Colors.white,
         secondaryVariant: Colors.white,

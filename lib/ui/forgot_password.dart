@@ -1,15 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mis_app/ui/admin_menu.dart';
-import 'package:mis_app/ui/view_adviser.dart';
-import 'package:mis_app/ui/view_course.dart';
-import 'package:mis_app/ui/view_course_list.dart';
-import 'package:mis_app/ui/login.dart';
-import 'package:mis_app/ui/register_student.dart';
 import 'package:provider/provider.dart';
 import 'package:mis_app/providers/theme_manager.dart';
 import 'package:mis_app/util/utility.dart';
-import 'package:mis_app/widgets/ensure_visible.dart';
 
 class ChangePassword extends StatefulWidget {
   @override
@@ -254,7 +248,7 @@ class _ChangePasswordState extends State<ChangePassword> {
                                       child: Text(
                                         'Cancel',
                                         style: TextStyle(
-                                            fontSize: 14, color: Colors.white),
+                                            fontSize: 16, color: Colors.white),
                                       ),
                                     ),
                                     onTap: () => _cancel(),
@@ -274,7 +268,7 @@ class _ChangePasswordState extends State<ChangePassword> {
                                       child: Text(
                                         'Change Password',
                                         style: TextStyle(
-                                            fontSize: 14, color: Colors.white),
+                                            fontSize: 16, color: Colors.white),
                                       ),
                                     ),
                                     onTap: () => _login(),
