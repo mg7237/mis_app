@@ -5,6 +5,7 @@ class PreferenceConnector {
   static const DEVICE_ID = 'device_id';
   static const LOGIN_DATE_TIME = 'login_date_time';
   static const THEME_SELECTED = 'ENVIRONMENT';
+  static const REMEMBER_ME = 'remember_me';
 
   _getSharedPreference() async {
     return await SharedPreferences.getInstance();
