@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:date_time_picker/date_time_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:mis_app/providers/theme_manager.dart';
+import 'package:mis_app/util/firebase_utilities.dart';
+import 'package:mis_app/ui/student_home.dart';
+import 'package:mis_app/models/student_model.dart';
+import 'package:mis_app/models/adviser_model.dart';
+import 'package:mis_app/util/constants.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -18,48 +23,8 @@ class _RegisterSudentState extends State<RegisterSudent> {
   String? _selectedCourse;
   List<DropdownMenuItem<String>> facultyList = [];
   List<DropdownMenuItem<String>> courseList = [];
-  List<String> advisers = ['John Doe', 'Jack Doe', 'Jane Doe'];
+  List<String> advisers = [];
   String? _selectedAdviser;
-
-  Map<String, Map<String, List<String>>> academicData = {
-    'Under Graduate': {
-      'Faculty of Education': [
-        'Associate in arts',
-        'Bachelor of Education Studies'
-      ],
-      'Faculty of Information & Communication Studies': [
-        'Bachelor of Arts in Multimedia Studies'
-      ]
-    },
-    'Graduate': {
-      'Faculty of Education': [
-        'Graduate Certificate Faculty of Education Graduate Certificate in Distance Education'
-      ],
-      'Faculty of Management & Development Studies': [
-        'Graduate Certificate in ASEAN Studies'
-      ]
-    },
-    'Diploma': {
-      'Faculty of Education': [
-        'Diploma in Science Teaching',
-        'Diploma in Mathematics Teaching',
-        'Diploma in Language and Literacy Education',
-        'Diploma in Social Studies Education'
-      ],
-      'Faculty of Management & Development Studies': [
-        'Diploma in Environment and Natural Resource Management',
-        'Diploma in International Health',
-        'Diploma in Land Valuation and Management',
-        'Diploma in Research and Development Management',
-        'Diploma in Land Use Planning',
-        'Diploma in Social Work',
-        'Diploma in Women and Development'
-      ],
-      'Faculty of Information & Communication Studies': [
-        'Diploma in Computer Science'
-      ],
-    },
-  };
 
   XFile? image;
   TextEditingController studentNumberController = TextEditingController();
@@ -73,40 +38,36 @@ class _RegisterSudentState extends State<RegisterSudent> {
   TextEditingController dobController = TextEditingController();
   String _dateLabelText = 'Date of Birth';
 
+  static final registerKey = GlobalKey<FormState>();
+  List<DropdownMenuItem<String>> items = [];
+  late double fieldWidth;
   @override
   void initState() {
     super.initState();
+    _getAdvisers();
   }
 
-  checkPermission(bool result) async {
-    if (result) {
-      getImage(result);
-    } else {
-      getImage(false);
-    }
+  _getAdvisers() async {
+    List<Adviser> adviserData = await FirebaseUtilities.getAdvisers();
+    adviserData.forEach((element) {
+      advisers.add(element.lastName +
+          ',' +
+          element.firstName +
+          ' ' +
+          element.middleName);
+    });
+    items = _getMenuItems();
+    setState(() {});
   }
 
-  void updateFacultyDropdown(String? selectedAcademicLevel) {
-    if (selectedAcademicLevel == null) return;
-    List<String> faculties = academicData[selectedAcademicLevel]!.keys.toList();
-    faculties.forEach((element) {
-      facultyList.add(DropdownMenuItem(
-          child: Text(element,
-              overflow: TextOverflow.fade, style: TextStyle(fontSize: 14)),
+  List<DropdownMenuItem<String>> _getMenuItems() {
+    List<DropdownMenuItem<String>> items = [];
+    advisers.forEach((element) {
+      items.add(DropdownMenuItem(
+          child: Text(element, style: TextStyle(fontSize: 14)),
           value: element));
     });
-  }
-
-  void updateCourseDropdown(String? selectedFaculty) {
-    if (selectedFaculty == null) return;
-    List<String>? courses =
-        academicData[_selectedAcademicLevel]![selectedFaculty];
-    courses?.forEach((element) {
-      courseList.add(DropdownMenuItem(
-          child: Text(element,
-              overflow: TextOverflow.fade, style: TextStyle(fontSize: 14)),
-          value: element));
-    });
+    return items;
   }
 
   Future getImage(bool result) async {
@@ -129,8 +90,115 @@ class _RegisterSudentState extends State<RegisterSudent> {
     }
   }
 
+  checkPermission(bool result) async {
+    if (result) {
+      getImage(result);
+    } else {
+      getImage(false);
+    }
+  }
+
+  void updateFacultyDropdown(String? selectedAcademicLevel) {
+    if (selectedAcademicLevel == null) return;
+    List<String> faculties = academicData[selectedAcademicLevel]!.keys.toList();
+    faculties.forEach((element) {
+      facultyList.add(DropdownMenuItem(
+          child: Text(element,
+              overflow: TextOverflow.fade, style: TextStyle(fontSize: 14)),
+          value: element));
+    });
+  }
+
+  void _registerStudent() async {
+    Student student = Student(
+        firstName: firstNameController.text,
+        lastName: lastNameController.text,
+        middleName: middleNameController.text,
+        academicLevel: academicLevel.text,
+        program: programController.text,
+        faculty: facultyController.text,
+        adviser: advisorController.text,
+        photoUrl: '',
+        rollNumber: studentNumberController.text,
+        currentSemester: '',
+        dateOfBirth: dobController.text);
+
+    if (registerKey.currentState?.validate() ?? false) {
+      if (await FirebaseUtilities.createStudent(student)) {
+        await showDialog(
+            context: context,
+            builder: (BuildContext context) => AlertDialog(
+                  backgroundColor: Colors.blue,
+                  title: Text('Success'),
+                  content: Container(
+                    height: 100,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(''),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        Text('Student Registered'),
+                      ],
+                    ),
+                  ),
+                  actions: <Widget>[
+                    new IconButton(
+                        icon: new Icon(Icons.close),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        })
+                  ],
+                ));
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => StudentHome()));
+      } else {
+        await showDialog(
+            context: context,
+            builder: (BuildContext context) => AlertDialog(
+                  backgroundColor: Colors.blue,
+                  title: Text('Failure'),
+                  content: Container(
+                    height: 100,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(''),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        Text('Register failed, please try again'),
+                      ],
+                    ),
+                  ),
+                  actions: <Widget>[
+                    new IconButton(
+                        icon: new Icon(Icons.close),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        })
+                  ],
+                ));
+      }
+    }
+  }
+
+  void updateCourseDropdown(String? selectedFaculty) {
+    if (selectedFaculty == null) return;
+    List<String>? courses =
+        academicData[_selectedAcademicLevel]![selectedFaculty];
+    courses?.forEach((element) {
+      courseList.add(DropdownMenuItem(
+          child: Text(element,
+              overflow: TextOverflow.fade, style: TextStyle(fontSize: 14)),
+          value: element));
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    fieldWidth = MediaQuery.of(context).size.width - 80;
     return Consumer<ThemeNotifier>(
         builder: (context, theme, _) => MaterialApp(
             theme: theme.getTheme(),
@@ -138,318 +206,329 @@ class _RegisterSudentState extends State<RegisterSudent> {
               child: Scaffold(
                   resizeToAvoidBottomInset: false,
                   body: Form(
-                    child: Container(
-                      margin: EdgeInsets.all(20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(height: 20),
-                          Text('Sign Up',
-                              style: TextStyle(
-                                  fontSize: 28, fontWeight: FontWeight.bold)),
-                          SizedBox(height: 20),
-                          Column(
-                            children: [
-                              Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Container(
-                                        height: 100,
-                                        width: 100,
-                                        child: InkWell(
-                                            child: Image(
-                                                image: AssetImage(
-                                                    'assets/icon/placeholder.jpg')),
-                                            onTap: () async {
-                                              bool checkCameraPermission =
-                                                  false;
-                                              showCupertinoModalPopup(
-                                                  context: context,
-                                                  builder: (context) {
-                                                    return CupertinoActionSheet(
-                                                      title: Text(
-                                                        ' Image',
-                                                        style: TextStyle(
-                                                            fontSize: 20,
-                                                            color: Colors.grey),
-                                                      ),
-                                                      actions: <Widget>[
-                                                        CupertinoActionSheetAction(
-                                                          child: Text(
-                                                              " from Camera"),
-                                                          onPressed: () async {
-                                                            checkCameraPermission =
-                                                                true;
-                                                            checkPermission(
-                                                                checkCameraPermission);
-                                                            Navigator.pop(
-                                                                context);
-                                                          },
-                                                        ),
-                                                        CupertinoActionSheetAction(
-                                                          child: Text(
-                                                              " from Gallery"),
-                                                          onPressed: () async {
-                                                            checkPermission(
-                                                                false);
-                                                            Navigator.pop(
-                                                                context);
-                                                          },
-                                                        ),
-                                                      ],
-                                                    );
-                                                  });
-                                            })),
-                                    Padding(
-                                      padding:
-                                          const EdgeInsets.only(left: 20.0),
-                                      child: Column(
-                                        children: [
-                                          Container(
-                                            width: 220,
-                                            height: 30,
-                                            child: TextFormField(
-                                              decoration: InputDecoration(
-                                                  hintText: 'Student Number'),
-                                              controller:
-                                                  studentNumberController,
-                                              style: TextStyle(fontSize: 14),
-                                              keyboardType:
-                                                  TextInputType.number,
-                                              validator: (String? value) {
-                                                if (value == null ||
-                                                    value == '') {
-                                                  return 'Please enter Student Number';
-                                                }
-                                              },
-                                            ),
-                                          ),
-                                          Container(
-                                            width: 220,
-                                            height: 40,
-                                            child: TextFormField(
-                                              decoration: InputDecoration(
-                                                  hintText: 'Last Name'),
-                                              controller: lastNameController,
-                                              style: TextStyle(fontSize: 14),
-                                              keyboardType: TextInputType.name,
-                                              validator: (String? value) {
-                                                if (value == null ||
-                                                    value == '') {
-                                                  return 'Please enter Last Name';
-                                                }
-                                              },
-                                            ),
-                                          ),
-                                          Container(
-                                            width: 220,
-                                            height: 40,
-                                            child: TextFormField(
-                                              decoration: InputDecoration(
-                                                  hintText: 'First Name'),
-                                              controller: firstNameController,
-                                              style: TextStyle(fontSize: 14),
-                                              keyboardType: TextInputType.name,
-                                              validator: (String? value) {
-                                                if (value == null ||
-                                                    value == '') {
-                                                  return 'Please enter First Name';
-                                                }
-                                              },
-                                            ),
-                                          ),
-                                          Container(
-                                            width: 220,
-                                            height: 40,
-                                            child: TextFormField(
-                                              decoration: InputDecoration(
-                                                  hintText: 'Middle Initial'),
-                                              controller: middleNameController,
-                                              style: TextStyle(fontSize: 14),
-                                              keyboardType: TextInputType.name,
-                                            ),
-                                          ),
-                                          Container(
-                                            height: 40,
-                                            width: 220,
-                                            padding: EdgeInsets.only(right: 10),
-                                            child: DateTimePicker(
-                                              calendarTitle:
-                                                  'Select Date of Birth',
-                                              type: DateTimePickerType.date,
-                                              dateMask: 'dd MMM, yyyy',
-                                              initialDate: DateTime(2000),
-                                              initialValue: '',
-                                              style: TextStyle(fontSize: 14),
-                                              firstDate: DateTime(1950),
-                                              lastDate: DateTime(2010),
-                                              icon: Icon(Icons.event),
-                                              dateLabelText: _dateLabelText,
-                                              onChanged: (val) {
-                                                if (val != '') {
-                                                  _dateLabelText = '';
-                                                } else {
-                                                  _dateLabelText =
-                                                      'Date of Birth';
-                                                }
-                                                setState(() {});
-                                              },
-                                              validator: (val) {
-                                                print(val);
-                                                return null;
-                                              },
-                                              onSaved: (val) => print(val),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
+                    key: registerKey,
+                    child: SingleChildScrollView(
+                      child: Container(
+                        margin: EdgeInsets.all(20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            SizedBox(height: 20),
+                            Text('Sign Up',
+                                style: TextStyle(
+                                    fontSize: 28, fontWeight: FontWeight.bold)),
+                            SizedBox(height: 20),
+                            Container(
+                                height: 100,
+                                width: 100,
+                                decoration: BoxDecoration(
+                                    border: Border.all(),
+                                    shape: BoxShape.circle),
+                                child: InkWell(
+                                    child: ClipOval(
+                                      child: Image(
+                                          fit: BoxFit.fill,
+                                          image: AssetImage(
+                                              'assets/icon/placeholder.jpg')),
                                     ),
-                                  ]),
-                            ],
-                          ),
-                          SizedBox(
-                            height: 20,
-                          ),
-                          Container(
-                            padding: EdgeInsets.only(right: 10),
-                            width: MediaQuery.of(context).size.width,
-                            child: DropdownButtonFormField(
-                                value: _selectedAcademicLevel,
-                                onChanged: (String? value) {
-                                  _selectedAcademicLevel = value;
-                                  updateFacultyDropdown(_selectedAcademicLevel);
-                                  _selectedFaculty = null;
-                                  _selectedCourse = null;
-                                  setState(() {});
-                                },
-                                hint: Text('Select Academic Level',
-                                    style: TextStyle(fontSize: 14)),
-                                items: [
-                                  DropdownMenuItem(
-                                    child: Text(
-                                      academicData.keys.toList()[0],
-                                      style: TextStyle(fontSize: 14),
-                                    ),
-                                    value: academicData.keys.toList()[0],
-                                  ),
-                                  DropdownMenuItem(
-                                      child: Text(academicData.keys.toList()[1],
-                                          style: TextStyle(fontSize: 14)),
-                                      value: academicData.keys.toList()[1]),
-                                  DropdownMenuItem(
-                                      child: Text(academicData.keys.toList()[2],
-                                          style: TextStyle(fontSize: 14)),
-                                      value: academicData.keys.toList()[2])
-                                ]),
-                          ),
-                          Container(
-                            padding: EdgeInsets.only(right: 10),
-                            width: MediaQuery.of(context).size.width,
-                            child: DropdownButtonFormField<String>(
-                                hint: Text('Select Faculty',
-                                    style: TextStyle(fontSize: 14)),
-                                isExpanded: true,
-                                value: _selectedFaculty,
-                                onChanged: (String? value) {
-                                  _selectedFaculty = value ?? '';
-                                  updateCourseDropdown(_selectedFaculty);
-                                  setState(() {});
-                                },
-                                items: facultyList),
-                          ),
-                          Container(
-                            padding: EdgeInsets.only(right: 10),
-                            width: MediaQuery.of(context).size.width,
-                            child: DropdownButtonFormField(
-                                hint: Text('Select Program',
-                                    style: TextStyle(fontSize: 14)),
-                                isExpanded: true,
-                                value: _selectedCourse,
-                                onChanged: (String? value) {
-                                  _selectedCourse = value ?? '';
-                                  setState(() {});
-                                },
-                                items: courseList),
-                          ),
-                          SizedBox(height: 10),
-                          Container(
-                            padding: EdgeInsets.only(right: 10),
-                            width: MediaQuery.of(context).size.width,
-                            child: DropdownButtonFormField(
-                                value: _selectedAdviser,
-                                onChanged: (String? value) {
-                                  _selectedAdviser = value;
-                                  setState(() {});
-                                },
-                                hint: Text('Select Adviser',
-                                    style: TextStyle(fontSize: 14)),
-                                items: [
-                                  DropdownMenuItem(
-                                    child: Text(
-                                      advisers[0],
-                                      style: TextStyle(fontSize: 14),
-                                    ),
-                                    value: academicData.keys.toList()[0],
-                                  ),
-                                  DropdownMenuItem(
-                                      child: Text(advisers[1],
-                                          style: TextStyle(fontSize: 14)),
-                                      value: advisers[1]),
-                                  DropdownMenuItem(
-                                      child: Text(advisers[2],
-                                          style: TextStyle(fontSize: 14)),
-                                      value: advisers[2])
-                                ]),
-                          ),
-                          SizedBox(height: 30),
-                          Container(
-                            width: MediaQuery.of(context).size.width - 50,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    onTap: () async {
+                                      bool checkCameraPermission = false;
+                                      showCupertinoModalPopup(
+                                          context: context,
+                                          builder: (context) {
+                                            return CupertinoActionSheet(
+                                              title: Text(
+                                                ' Image',
+                                                style: TextStyle(
+                                                    fontSize: 20,
+                                                    color: Colors.grey),
+                                              ),
+                                              actions: <Widget>[
+                                                CupertinoActionSheetAction(
+                                                  child: Text(" from Camera"),
+                                                  onPressed: () async {
+                                                    checkCameraPermission =
+                                                        true;
+                                                    checkPermission(
+                                                        checkCameraPermission);
+                                                    Navigator.pop(context);
+                                                  },
+                                                ),
+                                                CupertinoActionSheetAction(
+                                                  child: Text(" from Gallery"),
+                                                  onPressed: () async {
+                                                    checkPermission(false);
+                                                    Navigator.pop(context);
+                                                  },
+                                                ),
+                                              ],
+                                            );
+                                          });
+                                    })),
+                            Column(
                               children: [
-                                Container(
-                                    height: 50,
-                                    width: 160,
-                                    decoration: BoxDecoration(
-                                        color: Colors.blue,
-                                        border: Border.all(width: 1),
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(10))),
-                                    child: InkWell(
-                                      child: Center(
-                                        child: Text(
-                                          'Cancel',
-                                          style: TextStyle(
-                                              fontSize: 16,
-                                              color: Colors.white),
+                                Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 20.0),
+                                        child: Column(
+                                          children: [
+                                            Container(
+                                              width: fieldWidth,
+                                              child: TextFormField(
+                                                decoration: InputDecoration(
+                                                  hintText: 'Student Number',
+                                                  contentPadding:
+                                                      new EdgeInsets.symmetric(
+                                                          vertical: 0,
+                                                          horizontal: 5.0),
+                                                ),
+                                                controller:
+                                                    studentNumberController,
+                                                style: TextStyle(fontSize: 14),
+                                                keyboardType:
+                                                    TextInputType.number,
+                                                validator: (String? value) {
+                                                  if (value == null ||
+                                                      value == '') {
+                                                    return 'Please enter Student Number';
+                                                  }
+                                                },
+                                              ),
+                                            ),
+                                            Container(
+                                              width: fieldWidth,
+                                              child: TextFormField(
+                                                decoration: InputDecoration(
+                                                    hintText: 'Last Name',
+                                                    contentPadding:
+                                                        new EdgeInsets
+                                                                .symmetric(
+                                                            vertical: 0,
+                                                            horizontal: 5.0)),
+                                                controller: lastNameController,
+                                                style: TextStyle(fontSize: 14),
+                                                keyboardType:
+                                                    TextInputType.name,
+                                                validator: (String? value) {
+                                                  if (value == null ||
+                                                      value == '') {
+                                                    return 'Please enter Last Name';
+                                                  }
+                                                },
+                                              ),
+                                            ),
+                                            Container(
+                                              width: fieldWidth,
+                                              child: TextFormField(
+                                                decoration: InputDecoration(
+                                                    hintText: 'First Name',
+                                                    contentPadding:
+                                                        new EdgeInsets
+                                                                .symmetric(
+                                                            vertical: 0,
+                                                            horizontal: 5.0)),
+                                                controller: firstNameController,
+                                                style: TextStyle(fontSize: 14),
+                                                keyboardType:
+                                                    TextInputType.name,
+                                                validator: (String? value) {
+                                                  if (value == null ||
+                                                      value == '') {
+                                                    return 'Please enter First Name';
+                                                  }
+                                                },
+                                              ),
+                                            ),
+                                            Container(
+                                              width: fieldWidth,
+                                              child: TextFormField(
+                                                decoration: InputDecoration(
+                                                    hintText: 'Middle Initial',
+                                                    contentPadding:
+                                                        new EdgeInsets
+                                                                .symmetric(
+                                                            vertical: 0,
+                                                            horizontal: 5.0)),
+                                                controller:
+                                                    middleNameController,
+                                                style: TextStyle(fontSize: 14),
+                                                keyboardType:
+                                                    TextInputType.name,
+                                              ),
+                                            ),
+                                            Container(
+                                              width: fieldWidth,
+                                              //padding: EdgeInsets.only(right: 10),
+                                              child: DateTimePicker(
+                                                calendarTitle:
+                                                    'Select Date of Birth',
+                                                type: DateTimePickerType.date,
+                                                dateMask: 'dd MMM, yyyy',
+                                                initialDate: DateTime(2000),
+                                                controller: dobController,
+                                                style: TextStyle(fontSize: 14),
+                                                firstDate: DateTime(1950),
+                                                lastDate: DateTime(2010),
+                                                icon: Icon(Icons.event),
+                                                dateLabelText: _dateLabelText,
+                                                onChanged: (val) {
+                                                  if (val != '') {
+                                                    _dateLabelText = '';
+                                                  } else {
+                                                    _dateLabelText =
+                                                        'Date of Birth';
+                                                  }
+                                                  setState(() {});
+                                                },
+                                                validator: (val) {
+                                                  print(val);
+                                                  return null;
+                                                },
+                                                onSaved: (val) => print(val),
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
-                                      onTap: () {},
-                                    )),
-                                SizedBox(width: 20),
-                                Container(
-                                    height: 50,
-                                    width: 160,
-                                    decoration: BoxDecoration(
-                                        color: Colors.blue,
-                                        border: Border.all(width: 1),
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(10))),
-                                    child: InkWell(
-                                      child: Center(
-                                        child: Text(
-                                          'Register',
-                                          style: TextStyle(
-                                              fontSize: 16,
-                                              color: Colors.white),
-                                        ),
-                                      ),
-                                      onTap: () => {},
-                                    )),
+                                    ]),
                               ],
                             ),
-                          ),
-                        ],
+                            SizedBox(
+                              height: 20,
+                            ),
+                            Container(
+                              padding: EdgeInsets.only(right: 10),
+                              width: MediaQuery.of(context).size.width,
+                              child: DropdownButtonFormField(
+                                  value: _selectedAcademicLevel,
+                                  onChanged: (String? value) {
+                                    _selectedAcademicLevel = value;
+                                    updateFacultyDropdown(
+                                        _selectedAcademicLevel);
+                                    _selectedFaculty = null;
+                                    _selectedCourse = null;
+                                    setState(() {});
+                                  },
+                                  hint: Text('Select Academic Level',
+                                      style: TextStyle(fontSize: 14)),
+                                  items: [
+                                    DropdownMenuItem(
+                                      child: Text(
+                                        academicData.keys.toList()[0],
+                                        style: TextStyle(fontSize: 14),
+                                      ),
+                                      value: academicData.keys.toList()[0],
+                                    ),
+                                    DropdownMenuItem(
+                                        child: Text(
+                                            academicData.keys.toList()[1],
+                                            style: TextStyle(fontSize: 14)),
+                                        value: academicData.keys.toList()[1]),
+                                    DropdownMenuItem(
+                                        child: Text(
+                                            academicData.keys.toList()[2],
+                                            style: TextStyle(fontSize: 14)),
+                                        value: academicData.keys.toList()[2])
+                                  ]),
+                            ),
+                            Container(
+                              padding: EdgeInsets.only(right: 10),
+                              width: MediaQuery.of(context).size.width,
+                              child: DropdownButtonFormField<String>(
+                                  hint: Text('Select Faculty',
+                                      style: TextStyle(fontSize: 14)),
+                                  isExpanded: true,
+                                  value: _selectedFaculty,
+                                  onChanged: (String? value) {
+                                    _selectedFaculty = value ?? '';
+                                    updateCourseDropdown(_selectedFaculty);
+                                    setState(() {});
+                                  },
+                                  items: facultyList),
+                            ),
+                            Container(
+                              padding: EdgeInsets.only(right: 10),
+                              width: MediaQuery.of(context).size.width,
+                              child: DropdownButtonFormField(
+                                  hint: Text('Select Program',
+                                      style: TextStyle(fontSize: 14)),
+                                  isExpanded: true,
+                                  value: _selectedCourse,
+                                  onChanged: (String? value) {
+                                    _selectedCourse = value ?? '';
+                                    setState(() {});
+                                  },
+                                  items: courseList),
+                            ),
+                            SizedBox(height: 10),
+                            Container(
+                              padding: EdgeInsets.only(right: 10),
+                              width: MediaQuery.of(context).size.width,
+                              child: DropdownButtonFormField<String>(
+                                  value: _selectedAdviser,
+                                  onChanged: (String? value) {
+                                    _selectedAdviser = value.toString();
+                                    setState(() {});
+                                  },
+                                  hint: Text('Select Adviser',
+                                      style: TextStyle(fontSize: 14)),
+                                  items: items),
+                            ),
+                            SizedBox(height: 30),
+                            Container(
+                              width: MediaQuery.of(context).size.width - 50,
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Container(
+                                      height: 50,
+                                      width: 160,
+                                      decoration: BoxDecoration(
+                                          color: Colors.blue,
+                                          border: Border.all(width: 1),
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(10))),
+                                      child: InkWell(
+                                        child: Center(
+                                          child: Text(
+                                            'Cancel',
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                color: Colors.white),
+                                          ),
+                                        ),
+                                        onTap: () {},
+                                      )),
+                                  SizedBox(width: 20),
+                                  Container(
+                                      height: 50,
+                                      width: 160,
+                                      decoration: BoxDecoration(
+                                          color: Colors.blue,
+                                          border: Border.all(width: 1),
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(10))),
+                                      child: InkWell(
+                                        child: Center(
+                                          child: Text(
+                                            'Register',
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                color: Colors.white),
+                                          ),
+                                        ),
+                                        onTap: () => _registerStudent(),
+                                      )),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   )),

@@ -9,7 +9,7 @@ import 'package:mis_app/ui/register_student.dart';
 import 'package:mis_app/ui/view_adviser_list.dart';
 import 'package:mis_app/ui/view_admin_list.dart';
 import 'package:mis_app/ui/view_course_list.dart';
-import 'package:mis_app/ui/view_student.dart';
+import 'package:mis_app/ui/view_student_list.dart';
 
 import 'package:provider/provider.dart';
 
@@ -55,7 +55,7 @@ class _AdminMenuState extends State<AdminMenu> {
           context, MaterialPageRoute(builder: (context) => ViewCourseList()));
     } else if (buttonName == 'ViewStudentsBtn') {
       Navigator.push(
-          context, MaterialPageRoute(builder: (context) => ViewStudent()));
+          context, MaterialPageRoute(builder: (context) => StudentList()));
     }
   }
 

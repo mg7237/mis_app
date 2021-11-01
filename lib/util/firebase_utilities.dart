@@ -1,10 +1,9 @@
 import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
-import 'package:collection/collection.dart';
+import 'package:mis_app/models/student_model.dart';
 import 'package:mis_app/models/user_model.dart';
+import 'package:mis_app/models/adviser_model.dart';
 
 class FirebaseUtilities {
   static var firebaseInstance = auth.FirebaseAuth.instance;
@@ -46,6 +45,16 @@ class FirebaseUtilities {
     }
   }
 
+  static Future<bool> createStudent(Student student) async {
+    await firestore.collection('STUDENT').doc().set(student.toJson()).then(
+        (document) {
+      return true;
+    }, onError: (e, s) {
+      return false;
+    });
+    return false;
+  }
+
   static Future<bool> _saveStudentData(User user) async {
     await firestore.collection('USERS').doc().set(user.toJson()).then(
         (document) {
@@ -54,5 +63,38 @@ class FirebaseUtilities {
       return false;
     });
     return false;
+  }
+
+  static Future<List<Adviser>> getAdvisers() async {
+    List<Adviser> advisors = [];
+    try {
+      var result = await firestore.collection("ADVISERS").get();
+      if (result.docs.length > 0) {
+        List<QueryDocumentSnapshot<Map<String, dynamic>>> advisorsData =
+            result.docs;
+        advisorsData.forEach((element) {
+          advisors.add(Adviser.fromMap(element.data()));
+        });
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+    return advisors;
+  }
+
+  static Future<User?> getUser(String emailId) async {
+    User? user;
+    try {
+      QuerySnapshot<Map<String, dynamic>> result = await firestore
+          .collection("USERS")
+          .where("email", isEqualTo: emailId)
+          .get();
+      if (result.docs.length > 0) {
+        user = User.fromJson(result.docs[0].data());
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+    return user;
   }
 }

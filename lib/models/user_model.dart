@@ -12,4 +12,11 @@ class User {
       'userType': this.userType
     };
   }
+
+  static User fromJson(Map<String, dynamic> json) {
+    return User(
+        email: json['email'],
+        userId: json['userId'],
+        userType: json['userType']);
+  }
 }

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:mis_app/providers/theme_manager.dart';
-import 'package:mis_app/ui/view_adviser.dart';
 
 class AdminList extends StatefulWidget {
   const AdminList({Key? key}) : super(key: key);
