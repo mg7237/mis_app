@@ -33,9 +33,6 @@ class _LoginState extends State<Login> {
   bool rememberMe = false;
 
   _cancel() async {
-    bool result = await FirebaseUtilities.createUserWithEmailAndPassword(
-        email: _userIdController.text, password: _passwordController.text);
-
     _userIdController.text = '';
     _passwordController.text = '';
     setState(() {});
@@ -321,13 +318,7 @@ class _LoginState extends State<Login> {
                                           ),
                                         ),
                                         onTap: () {
-                                          // Navigator.of(context).push(
-                                          //     MaterialPageRoute(
-                                          //         builder: (context) =>
-                                          //             RegisterSudent()));
-                                          _userIdController.text = '';
-                                          _passwordController.text = '';
-                                          setState(() {});
+                                          _cancel();
                                         })),
                                 SizedBox(width: 20),
                                 Container(
