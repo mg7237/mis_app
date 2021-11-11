@@ -6,6 +6,8 @@ class PreferenceConnector {
   static const LOGIN_DATE_TIME = 'login_date_time';
   static const THEME_SELECTED = 'ENVIRONMENT';
   static const REMEMBER_ME = 'remember_me';
+  static const USER_ID = 'user_id';
+  static const USER_TYPE = 'user_type';
 
   _getSharedPreference() async {
     return await SharedPreferences.getInstance();

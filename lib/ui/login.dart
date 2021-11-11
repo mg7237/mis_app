@@ -11,6 +11,7 @@ import 'package:mis_app/util/utility.dart';
 import 'package:mis_app/util/preference_connector.dart';
 import 'package:mis_app/util/storage_manager.dart';
 import 'package:mis_app/util/firebase_utilities.dart';
+import 'package:firebase_auth/firebase_auth.dart' as auth;
 
 class Login extends StatefulWidget {
   @override
@@ -79,6 +80,8 @@ class _LoginState extends State<Login> {
                     ],
                   ));
         } else {
+          StorageManager.saveData(PreferenceConnector.USER_ID, user.userId);
+          StorageManager.saveData(PreferenceConnector.USER_TYPE, user.userType);
           if (user.userType == 'ADMIN') {
             Navigator.pushReplacement(
                 context, MaterialPageRoute(builder: (context) => AdminMenu()));
@@ -186,7 +189,6 @@ class _LoginState extends State<Login> {
                                     BorderRadius.all(Radius.circular(10))),
                             child: TextFormField(
                               autofocus: false,
-                              //enabled: !showLoader,
                               style: TextStyle(fontSize: 14),
                               decoration: const InputDecoration(
                                   border: OutlineInputBorder(
@@ -197,7 +199,6 @@ class _LoginState extends State<Login> {
                                   hintText: 'User Id',
                                   hintStyle: TextStyle(color: Colors.black),
                                   fillColor: Colors.white),
-
                               validator: (value) {
                                 if ((value ?? '') != '') {
                                   return null;
@@ -224,7 +225,6 @@ class _LoginState extends State<Login> {
                               child: Stack(children: [
                                 TextFormField(
                                   style: TextStyle(fontSize: 14),
-                                  //enabled: !showLoader,
                                   decoration: const InputDecoration(
                                     border: OutlineInputBorder(
                                         borderRadius: BorderRadius.all(
@@ -232,7 +232,6 @@ class _LoginState extends State<Login> {
                                     hintText: 'Password',
                                     hintStyle: TextStyle(color: Colors.black),
                                   ),
-
                                   validator: (value) {
                                     if ((value ?? '') != '') {
                                       return null;
@@ -302,7 +301,9 @@ class _LoginState extends State<Login> {
                               children: [
                                 Container(
                                     height: 50,
-                                    width: 160,
+                                    width: (MediaQuery.of(context).size.width -
+                                            100) /
+                                        2,
                                     decoration: BoxDecoration(
                                         color: Colors.blue,
                                         border: Border.all(width: 1),
@@ -323,7 +324,9 @@ class _LoginState extends State<Login> {
                                 SizedBox(width: 20),
                                 Container(
                                     height: 50,
-                                    width: 160,
+                                    width: (MediaQuery.of(context).size.width -
+                                            100) /
+                                        2,
                                     decoration: BoxDecoration(
                                         color: Colors.blue,
                                         border: Border.all(width: 1),
@@ -369,9 +372,74 @@ class _LoginState extends State<Login> {
                           ),
                           Center(
                             child: InkWell(
-                              onTap: () {
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => ChangePassword()));
+                              onTap: () async {
+                                if (_userIdController.text == '') {
+                                  await showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) =>
+                                          AlertDialog(
+                                            backgroundColor: Colors.blue,
+                                            title: Text('Failure'),
+                                            content: Container(
+                                              height: 100,
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(''),
+                                                  SizedBox(
+                                                    height: 20,
+                                                  ),
+                                                  Text('Please enter user id'),
+                                                ],
+                                              ),
+                                            ),
+                                            actions: <Widget>[
+                                              new IconButton(
+                                                  icon: new Icon(Icons.close),
+                                                  onPressed: () {
+                                                    Navigator.pop(context);
+                                                  })
+                                            ],
+                                          ));
+                                  return;
+                                }
+                                final _auth = auth.FirebaseAuth.instance;
+                                try {
+                                  await _auth.sendPasswordResetEmail(
+                                      email: _userIdController.text);
+                                  // Navigator.of(context).push(MaterialPageRoute(
+                                  //     builder: (context) => ChangePassword()));
+                                } catch (e) {
+                                  await showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) =>
+                                          AlertDialog(
+                                            backgroundColor: Colors.blue,
+                                            title: Text('Failure'),
+                                            content: Container(
+                                              height: 200,
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(''),
+                                                  SizedBox(
+                                                    height: 20,
+                                                  ),
+                                                  Text(e.toString()),
+                                                ],
+                                              ),
+                                            ),
+                                            actions: <Widget>[
+                                              new IconButton(
+                                                  icon: new Icon(Icons.close),
+                                                  onPressed: () {
+                                                    Navigator.pop(context);
+                                                  })
+                                            ],
+                                          ));
+                                }
                               },
                               child: Text(
                                 'Forgot Username & Password',

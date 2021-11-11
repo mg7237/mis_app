@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:mis_app/ui/admin_menu.dart';
+import 'package:mis_app/ui/student_home.dart';
 import 'package:mis_app/util/preference_connector.dart';
 import 'package:mis_app/util/constants.dart';
 import 'package:flutter/material.dart';
@@ -18,16 +20,12 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   void navigationPage() async {
-    bool loggedBefore =
-        await PreferenceConnector().getBool(PreferenceConnector.LOGGED_BEFORE);
-    if (!loggedBefore) {
-      PreferenceConnector().setBool(PreferenceConnector.LOGGED_BEFORE, true);
-    }
-    // String themeData = await PreferenceConnector()
-    //     .getString(PreferenceConnector.THEME_SELECTED);
-    // if (themeData != '') {
-    //   globals.theme = themeData;
-    // } else {
+    bool rememberMe =
+        await PreferenceConnector().getBool(PreferenceConnector.REMEMBER_ME);
+    String userId =
+        await PreferenceConnector().getString(PreferenceConnector.USER_ID);
+    String userType =
+        await PreferenceConnector().getString(PreferenceConnector.USER_TYPE);
     final Brightness brightnessValue =
         MediaQuery.of(context).platformBrightness;
     bool isDark = brightnessValue == Brightness.dark;
@@ -40,7 +38,17 @@ class _SplashScreenState extends State<SplashScreen> {
     PreferenceConnector()
         .setString(PreferenceConnector.THEME_SELECTED, globals.theme);
 
-    Navigator.pushReplacementNamed(context, LOGIN);
+    if (rememberMe && userId != '' && userType != '') {
+      if (userType == 'ADMIN') {
+        Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => AdminMenu()));
+      } else {
+        Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => StudentHome()));
+      }
+    } else {
+      Navigator.pushReplacementNamed(context, LOGIN);
+    }
   }
 
   @override

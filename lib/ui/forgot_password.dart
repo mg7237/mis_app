@@ -1,9 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mis_app/ui/admin_menu.dart';
+import 'package:mis_app/ui/student_home.dart';
 import 'package:provider/provider.dart';
 import 'package:mis_app/providers/theme_manager.dart';
 import 'package:mis_app/util/utility.dart';
+import 'package:mis_app/util/firebase_utilities.dart';
+import 'package:mis_app/models/user_model.dart';
 
 class ChangePassword extends StatefulWidget {
   @override
@@ -44,9 +47,133 @@ class _ChangePasswordState extends State<ChangePassword> {
     });
   }
 
-  _login() {
-    Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) => AdminMenu()));
+  _changePassword() async {
+    if (_userIdController.text != '' &&
+        _passwordController.text != '' &&
+        _confirmPasswordController.text != '') {
+      User? user = await FirebaseUtilities.getUser(_userIdController.text);
+      if (user == null) {
+        await showDialog(
+            context: context,
+            builder: (BuildContext context) => AlertDialog(
+                  backgroundColor: Colors.blue,
+                  title: Text('Failure'),
+                  content: Container(
+                    height: 100,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(''),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        Text('Invalid User Id'),
+                      ],
+                    ),
+                  ),
+                  actions: <Widget>[
+                    new IconButton(
+                        icon: new Icon(Icons.close),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        })
+                  ],
+                ));
+        return;
+      } else if (_passwordController.text != _confirmPasswordController.text) {
+        await showDialog(
+            context: context,
+            builder: (BuildContext context) => AlertDialog(
+                  backgroundColor: Colors.blue,
+                  title: Text('Failure'),
+                  content: Container(
+                    height: 100,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(''),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        Text('Password & Confirm Password are different'),
+                      ],
+                    ),
+                  ),
+                  actions: <Widget>[
+                    new IconButton(
+                        icon: new Icon(Icons.close),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        })
+                  ],
+                ));
+      } else {
+        if (await FirebaseUtilities.changePassword(
+            _userIdController.text, _passwordController.text)) {
+          await showDialog(
+              context: context,
+              builder: (BuildContext context) => AlertDialog(
+                    backgroundColor: Colors.blue,
+                    title: Text('Success'),
+                    content: Container(
+                      height: 100,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(''),
+                          SizedBox(
+                            height: 20,
+                          ),
+                          Text('Password changed successfully'),
+                        ],
+                      ),
+                    ),
+                    actions: <Widget>[
+                      new IconButton(
+                          icon: new Icon(Icons.close),
+                          onPressed: () {
+                            Navigator.pop(context);
+                          })
+                    ],
+                  ));
+
+          if (user.userType == 'ADMIN') {
+            Navigator.pushReplacement(
+                context, MaterialPageRoute(builder: (context) => AdminMenu()));
+          } else {
+            Navigator.pushReplacement(context,
+                MaterialPageRoute(builder: (context) => StudentHome()));
+          }
+        } else {
+          await showDialog(
+              context: context,
+              builder: (BuildContext context) => AlertDialog(
+                    backgroundColor: Colors.blue,
+                    title: Text('Failure'),
+                    content: Container(
+                      height: 100,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(''),
+                          SizedBox(
+                            height: 20,
+                          ),
+                          Text('Unable to update password, please try later'),
+                        ],
+                      ),
+                    ),
+                    actions: <Widget>[
+                      new IconButton(
+                          icon: new Icon(Icons.close),
+                          onPressed: () {
+                            Navigator.pop(context);
+                          })
+                    ],
+                  ));
+        }
+      }
+    }
   }
 
   @override
@@ -271,7 +398,7 @@ class _ChangePasswordState extends State<ChangePassword> {
                                             fontSize: 16, color: Colors.white),
                                       ),
                                     ),
-                                    onTap: () => _login(),
+                                    onTap: () => _changePassword(),
                                   )),
                             ],
                           ),

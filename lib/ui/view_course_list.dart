@@ -4,6 +4,7 @@ import 'package:mis_app/ui/view_course.dart';
 import 'package:provider/provider.dart';
 import 'package:mis_app/providers/theme_manager.dart';
 import 'package:mis_app/models/student_model.dart';
+import 'package:mis_app/util/constants.dart';
 
 class ViewCourseList extends StatefulWidget {
   const ViewCourseList({Key? key}) : super(key: key);
@@ -15,13 +16,7 @@ class ViewCourseList extends StatefulWidget {
 class _ViewCourseListState extends State<ViewCourseList> {
   late Student student;
   String _selectedSemester = 'Semester 1 2021-2022';
-  List<String> semesters = [
-    'Semester 1 2021-2022',
-    'Semester 2 2020-2021',
-    'Semester 1 2020-2021',
-    'Semester 2 2019-20',
-    'Semester 1 2019-2020',
-  ];
+
   int index = 0;
 
   @override

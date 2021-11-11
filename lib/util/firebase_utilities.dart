@@ -1,9 +1,13 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:mis_app/models/student_model.dart';
 import 'package:mis_app/models/user_model.dart';
 import 'package:mis_app/models/adviser_model.dart';
+import 'package:mis_app/util/preference_connector.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class FirebaseUtilities {
   static var firebaseInstance = auth.FirebaseAuth.instance;
@@ -19,6 +23,10 @@ class FirebaseUtilities {
       if ((result.user?.uid ?? '') != '') {
         _saveStudentData(User(
             email: email, userId: result.user?.uid ?? '', userType: 'STUDENT'));
+        PreferenceConnector()
+            .setString(PreferenceConnector.USER_ID, result.user?.uid ?? '');
+        PreferenceConnector()
+            .setString(PreferenceConnector.USER_TYPE, 'STUDENT');
         return true;
       }
     } on auth.FirebaseAuthException catch (exception, s) {
@@ -52,7 +60,7 @@ class FirebaseUtilities {
     }, onError: (e, s) {
       return false;
     });
-    return false;
+    return true;
   }
 
   static Future<bool> _saveStudentData(User user) async {
@@ -96,5 +104,26 @@ class FirebaseUtilities {
       print(e.toString());
     }
     return user;
+  }
+
+  static Future<bool> changePassword(String userId, String password) async {
+    return true;
+  }
+
+  static Future<String> uploadImage(XFile image) async {
+    final _firebaseStorage = FirebaseStorage.instance;
+    var file = File(image.path);
+    String downloadUrl = '';
+    try {
+      String imageName =
+          await PreferenceConnector().getString(PreferenceConnector.USER_ID);
+      //Upload to Firebase
+      var snapshot =
+          await _firebaseStorage.ref().child(imageName).putFile(file);
+      downloadUrl = await snapshot.ref.getDownloadURL();
+    } catch (e) {
+      print(e.toString());
+    }
+    return downloadUrl;
   }
 }

@@ -40,3 +40,11 @@ Map<String, Map<String, List<String>>> academicData = {
     ],
   },
 };
+
+List<String> semesters = [
+  'Semester 1 2021-2022',
+  'Semester 2 2020-2021',
+  'Semester 1 2020-2021',
+  'Semester 2 2019-20',
+  'Semester 1 2019-2020',
+];

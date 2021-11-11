@@ -1,5 +1,7 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:date_time_picker/date_time_picker.dart';
+import 'package:mis_app/util/preference_connector.dart';
 import 'package:provider/provider.dart';
 import 'package:mis_app/providers/theme_manager.dart';
 import 'package:mis_app/util/firebase_utilities.dart';
@@ -9,6 +11,7 @@ import 'package:mis_app/models/adviser_model.dart';
 import 'package:mis_app/util/constants.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:mis_app/util/constants.dart';
 
 class RegisterSudent extends StatefulWidget {
   const RegisterSudent({Key? key}) : super(key: key);
@@ -25,7 +28,7 @@ class _RegisterSudentState extends State<RegisterSudent> {
   List<DropdownMenuItem<String>> courseList = [];
   List<String> advisers = [];
   String? _selectedAdviser;
-
+  final ImagePicker _picker = ImagePicker();
   XFile? image;
   TextEditingController studentNumberController = TextEditingController();
   TextEditingController firstNameController = TextEditingController();
@@ -37,6 +40,7 @@ class _RegisterSudentState extends State<RegisterSudent> {
   TextEditingController advisorController = TextEditingController();
   TextEditingController dobController = TextEditingController();
   String _dateLabelText = 'Date of Birth';
+  String _selectedSemester = 'Semester 1 2021-2022';
 
   static final registerKey = GlobalKey<FormState>();
   List<DropdownMenuItem<String>> items = [];
@@ -72,29 +76,19 @@ class _RegisterSudentState extends State<RegisterSudent> {
 
   Future getImage(bool result) async {
     if (result) {
-      var _image =
-          await ImagePicker.platform.getImage(source: ImageSource.camera);
+      var _image = await _picker.pickImage(source: ImageSource.camera);
       if (_image != null) {
         setState(() {
           image = _image;
         });
       }
     } else {
-      var _image =
-          await ImagePicker.platform.getImage(source: ImageSource.gallery);
+      var _image = await _picker.pickImage(source: ImageSource.gallery);
       if (_image != null) {
         setState(() {
           image = _image;
         });
       }
-    }
-  }
-
-  checkPermission(bool result) async {
-    if (result) {
-      getImage(result);
-    } else {
-      getImage(false);
     }
   }
 
@@ -110,17 +104,24 @@ class _RegisterSudentState extends State<RegisterSudent> {
   }
 
   void _registerStudent() async {
+    String url = '';
+    if (image != null) {
+      url = await FirebaseUtilities.uploadImage(image!);
+    }
+    String id =
+        await PreferenceConnector().getString(PreferenceConnector.USER_ID);
     Student student = Student(
+        id: id,
         firstName: firstNameController.text,
         lastName: lastNameController.text,
         middleName: middleNameController.text,
-        academicLevel: academicLevel.text,
-        program: programController.text,
-        faculty: facultyController.text,
-        adviser: advisorController.text,
-        photoUrl: '',
+        academicLevel: _selectedAcademicLevel ?? '',
+        program: _selectedCourse ?? '',
+        faculty: _selectedFaculty ?? '',
+        adviser: _selectedAdviser ?? '',
+        photoUrl: url,
         rollNumber: studentNumberController.text,
-        currentSemester: '',
+        currentSemester: _selectedSemester,
         dateOfBirth: dobController.text);
 
     if (registerKey.currentState?.validate() ?? false) {
@@ -213,7 +214,7 @@ class _RegisterSudentState extends State<RegisterSudent> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            SizedBox(height: 20),
+                            SizedBox(height: 1),
                             Text('Sign Up',
                                 style: TextStyle(
                                     fontSize: 28, fontWeight: FontWeight.bold)),
@@ -226,13 +227,13 @@ class _RegisterSudentState extends State<RegisterSudent> {
                                     shape: BoxShape.circle),
                                 child: InkWell(
                                     child: ClipOval(
-                                      child: Image(
-                                          fit: BoxFit.fill,
-                                          image: AssetImage(
-                                              'assets/icon/placeholder.jpg')),
+                                      child: image == null
+                                          ? Image(
+                                              image: AssetImage(
+                                                  'assets/icon/placeholder.jpg'))
+                                          : Image.file(File(image!.path)),
                                     ),
                                     onTap: () async {
-                                      bool checkCameraPermission = false;
                                       showCupertinoModalPopup(
                                           context: context,
                                           builder: (context) {
@@ -247,17 +248,14 @@ class _RegisterSudentState extends State<RegisterSudent> {
                                                 CupertinoActionSheetAction(
                                                   child: Text(" from Camera"),
                                                   onPressed: () async {
-                                                    checkCameraPermission =
-                                                        true;
-                                                    checkPermission(
-                                                        checkCameraPermission);
+                                                    getImage(true);
                                                     Navigator.pop(context);
                                                   },
                                                 ),
                                                 CupertinoActionSheetAction(
                                                   child: Text(" from Gallery"),
                                                   onPressed: () async {
-                                                    checkPermission(false);
+                                                    getImage(false);
                                                     Navigator.pop(context);
                                                   },
                                                 ),
@@ -266,6 +264,8 @@ class _RegisterSudentState extends State<RegisterSudent> {
                                           });
                                     })),
                             Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 Row(
                                     crossAxisAlignment:
@@ -399,6 +399,48 @@ class _RegisterSudentState extends State<RegisterSudent> {
                             ),
                             SizedBox(
                               height: 20,
+                            ),
+                            Container(
+                              width: MediaQuery.of(context).size.width,
+                              child: DropdownButton(
+                                value: _selectedSemester,
+                                onChanged: (String? value) {
+                                  _selectedSemester = value ?? semesters[0];
+                                  setState(() {});
+                                },
+                                items: [
+                                  DropdownMenuItem(
+                                      child: Text(
+                                        semesters[0],
+                                        style: TextStyle(fontSize: 14),
+                                      ),
+                                      value: semesters[0]),
+                                  DropdownMenuItem(
+                                      child: Text(
+                                        semesters[1],
+                                        style: TextStyle(fontSize: 14),
+                                      ),
+                                      value: semesters[1]),
+                                  DropdownMenuItem(
+                                      child: Text(
+                                        semesters[2],
+                                        style: TextStyle(fontSize: 14),
+                                      ),
+                                      value: semesters[2]),
+                                  DropdownMenuItem(
+                                      child: Text(
+                                        semesters[3],
+                                        style: TextStyle(fontSize: 14),
+                                      ),
+                                      value: semesters[3]),
+                                  DropdownMenuItem(
+                                      child: Text(
+                                        semesters[4],
+                                        style: TextStyle(fontSize: 14),
+                                      ),
+                                      value: semesters[4]),
+                                ],
+                              ),
                             ),
                             Container(
                               padding: EdgeInsets.only(right: 10),
