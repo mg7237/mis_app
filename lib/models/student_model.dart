@@ -1,5 +1,5 @@
 class Student {
-  String? id;
+  String? uid;
   String firstName;
   String lastName;
   String middleName;
@@ -12,7 +12,7 @@ class Student {
   String dateOfBirth;
   String currentSemester;
   Student({
-    this.id,
+    this.uid,
     required this.firstName,
     required this.lastName,
     required this.middleName,
@@ -28,7 +28,7 @@ class Student {
 
   Map<String, dynamic> toJson() {
     return {
-      'id': this.id,
+      'uid': this.uid,
       'photo_url': this.photoUrl,
       'first_name': this.firstName,
       'middle_name': this.middleName,
@@ -41,5 +41,22 @@ class Student {
       'date_of_birth': this.dateOfBirth.toString(),
       'current_semester': this.currentSemester
     };
+  }
+
+  static Student fromJson(Map<String, dynamic> json) {
+    return Student(
+      uid: json['uid'],
+      firstName: json['first_name'],
+      lastName: json['last_name'],
+      middleName: json['middle_name'] ?? '',
+      dateOfBirth: json['date_of_birth'] ?? '',
+      academicLevel: json['academic_level'] ?? '',
+      faculty: json['faculty'] ?? '',
+      program: json['program'] ?? '',
+      adviser: json['adviser'] ?? '',
+      rollNumber: json['roll_number'] ?? '',
+      currentSemester: json['current_semester'] ?? '',
+      photoUrl: json['photo_url'] ?? '',
+    );
   }
 }

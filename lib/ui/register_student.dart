@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:date_time_picker/date_time_picker.dart';
+import 'package:mis_app/ui/admin_menu.dart';
 import 'package:mis_app/util/preference_connector.dart';
 import 'package:provider/provider.dart';
 import 'package:mis_app/providers/theme_manager.dart';
@@ -11,10 +12,12 @@ import 'package:mis_app/models/adviser_model.dart';
 import 'package:mis_app/util/constants.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:mis_app/util/constants.dart';
 
 class RegisterSudent extends StatefulWidget {
-  const RegisterSudent({Key? key}) : super(key: key);
+  final bool newUser;
+  final String email;
+  const RegisterSudent({required this.newUser, required this.email, Key? key})
+      : super(key: key);
 
   @override
   _RegisterSudentState createState() => _RegisterSudentState();
@@ -34,13 +37,10 @@ class _RegisterSudentState extends State<RegisterSudent> {
   TextEditingController firstNameController = TextEditingController();
   TextEditingController lastNameController = TextEditingController();
   TextEditingController middleNameController = TextEditingController();
-  TextEditingController academicLevel = TextEditingController();
-  TextEditingController facultyController = TextEditingController();
-  TextEditingController programController = TextEditingController();
-  TextEditingController advisorController = TextEditingController();
   TextEditingController dobController = TextEditingController();
   String _dateLabelText = 'Date of Birth';
   String _selectedSemester = 'Semester 1 2021-2022';
+  String? url;
 
   static final registerKey = GlobalKey<FormState>();
   List<DropdownMenuItem<String>> items = [];
@@ -49,6 +49,26 @@ class _RegisterSudentState extends State<RegisterSudent> {
   void initState() {
     super.initState();
     _getAdvisers();
+    if (!widget.newUser) populateStudentData();
+  }
+
+  Future populateStudentData() async {
+    String userEmail = widget.email;
+    Student? studentData =
+        await FirebaseUtilities.getStudentDataByEmail(userEmail);
+    if (studentData != null) {
+      _selectedAcademicLevel = studentData.academicLevel;
+      _selectedFaculty = studentData.faculty;
+      _selectedCourse = studentData.program;
+      _selectedAdviser = studentData.adviser;
+      _selectedSemester = studentData.currentSemester;
+      studentNumberController.text = studentData.rollNumber;
+      firstNameController.text = studentData.firstName;
+      lastNameController.text = studentData.lastName;
+      middleNameController.text = studentData.middleName;
+      dobController.text = studentData.dateOfBirth;
+      url = studentData.photoUrl;
+    }
   }
 
   _getAdvisers() async {
@@ -111,7 +131,7 @@ class _RegisterSudentState extends State<RegisterSudent> {
     String id =
         await PreferenceConnector().getString(PreferenceConnector.USER_ID);
     Student student = Student(
-        id: id,
+        uid: id,
         firstName: firstNameController.text,
         lastName: lastNameController.text,
         middleName: middleNameController.text,
@@ -152,8 +172,17 @@ class _RegisterSudentState extends State<RegisterSudent> {
                         })
                   ],
                 ));
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => StudentHome()));
+        String userType = await PreferenceConnector()
+            .getString(PreferenceConnector.USER_TYPE);
+        if (userType == 'STUDENT') {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => StudentHome(email: widget.email)));
+        } else {
+          Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (context) => AdminMenu()));
+        }
       } else {
         await showDialog(
             context: context,
@@ -227,11 +256,13 @@ class _RegisterSudentState extends State<RegisterSudent> {
                                     shape: BoxShape.circle),
                                 child: InkWell(
                                     child: ClipOval(
-                                      child: image == null
-                                          ? Image(
-                                              image: AssetImage(
-                                                  'assets/icon/placeholder.jpg'))
-                                          : Image.file(File(image!.path)),
+                                      child: url != null
+                                          ? Image(image: NetworkImage(url!))
+                                          : image == null
+                                              ? Image(
+                                                  image: AssetImage(
+                                                      'assets/icon/placeholder.jpg'))
+                                              : Image.file(File(image!.path)),
                                     ),
                                     onTap: () async {
                                       showCupertinoModalPopup(

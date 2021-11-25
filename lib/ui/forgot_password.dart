@@ -48,10 +48,11 @@ class _ChangePasswordState extends State<ChangePassword> {
   }
 
   _changePassword() async {
-    if (_userIdController.text != '' &&
+    if (_userIdController.text.trim() != '' &&
         _passwordController.text != '' &&
         _confirmPasswordController.text != '') {
-      User? user = await FirebaseUtilities.getUser(_userIdController.text);
+      User? user =
+          await FirebaseUtilities.getUser(_userIdController.text.trim());
       if (user == null) {
         await showDialog(
             context: context,
@@ -109,7 +110,7 @@ class _ChangePasswordState extends State<ChangePassword> {
                 ));
       } else {
         if (await FirebaseUtilities.changePassword(
-            _userIdController.text, _passwordController.text)) {
+            _userIdController.text.trim(), _passwordController.text)) {
           await showDialog(
               context: context,
               builder: (BuildContext context) => AlertDialog(
@@ -141,8 +142,11 @@ class _ChangePasswordState extends State<ChangePassword> {
             Navigator.pushReplacement(
                 context, MaterialPageRoute(builder: (context) => AdminMenu()));
           } else {
-            Navigator.pushReplacement(context,
-                MaterialPageRoute(builder: (context) => StudentHome()));
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        StudentHome(email: _userIdController.text.trim())));
           }
         } else {
           await showDialog(

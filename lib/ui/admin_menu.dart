@@ -43,7 +43,9 @@ class _AdminMenuState extends State<AdminMenu> {
           context, MaterialPageRoute(builder: (context) => AddCourse()));
     } else if (buttonName == 'AddStudentBtn') {
       Navigator.push(
-          context, MaterialPageRoute(builder: (context) => RegisterSudent()));
+          context,
+          MaterialPageRoute(
+              builder: (context) => RegisterSudent(newUser: true, email: '')));
     } else if (buttonName == 'ViewAdvisersBtn') {
       Navigator.push(
           context, MaterialPageRoute(builder: (context) => AdviserList()));

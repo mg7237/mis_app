@@ -2,9 +2,11 @@ import 'dart:async';
 
 import 'package:mis_app/ui/admin_menu.dart';
 import 'package:mis_app/ui/student_home.dart';
+import 'package:mis_app/util/firebase_utilities.dart';
 import 'package:mis_app/util/preference_connector.dart';
 import 'package:mis_app/util/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:mis_app/models/user_model.dart';
 import 'package:mis_app/util/globals.dart' as globals;
 
 class SplashScreen extends StatefulWidget {
@@ -43,8 +45,12 @@ class _SplashScreenState extends State<SplashScreen> {
         Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (context) => AdminMenu()));
       } else {
-        Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => StudentHome()));
+        String userId =
+            await PreferenceConnector().getString(PreferenceConnector.USER_ID);
+        User? user = await FirebaseUtilities.getUser(userId);
+        if (user != null)
+          Navigator.of(context).pushReplacement(MaterialPageRoute(
+              builder: (context) => StudentHome(email: user.email)));
       }
     } else {
       Navigator.pushReplacementNamed(context, LOGIN);

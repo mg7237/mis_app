@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mis_app/util/preference_connector.dart';
 import 'package:provider/provider.dart';
 import 'package:mis_app/providers/theme_manager.dart';
 import 'package:mis_app/ui/register_student.dart';
@@ -54,6 +55,35 @@ class _CreateUserState extends State<CreateUser> {
           _userIdController.text.trim() == '') {
         return;
       }
+      if (_passwordController.text == _confirmPasswordController.text) {
+        await showDialog(
+            context: context,
+            builder: (BuildContext context) => AlertDialog(
+                  backgroundColor: Colors.blue,
+                  title: new Text('Failure'),
+                  content: Container(
+                    height: 100,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(''),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        Text('Password and Confirm Password should be same'),
+                      ],
+                    ),
+                  ),
+                  actions: <Widget>[
+                    new IconButton(
+                        icon: new Icon(Icons.close),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        })
+                  ],
+                ));
+        return;
+      }
       if (await FirebaseUtilities.createUserWithEmailAndPassword(
           email: _userIdController.text.trim(),
           password: _passwordController.text.trim())) {
@@ -83,8 +113,14 @@ class _CreateUserState extends State<CreateUser> {
                         })
                   ],
                 ));
+
         Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => RegisterSudent()));
+            context,
+            MaterialPageRoute(
+                builder: (context) => RegisterSudent(
+                      newUser: true,
+                      email: _userIdController.text.trim(),
+                    )));
       } else {
         await showDialog(
             context: context,

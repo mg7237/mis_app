@@ -21,12 +21,12 @@ class FirebaseUtilities {
           .createUserWithEmailAndPassword(email: email, password: password);
       print('creds: ' + (result.user?.uid ?? 'Fail'));
       if ((result.user?.uid ?? '') != '') {
-        _saveStudentData(User(
-            email: email, userId: result.user?.uid ?? '', userType: 'STUDENT'));
+        _saveStudentData(
+            User(email: email, userId: result.user!.uid, userType: 'STUDENT'));
         PreferenceConnector()
-            .setString(PreferenceConnector.USER_ID, result.user?.uid ?? '');
+            .setString(PreferenceConnector.USER_TYPE, "STUDENT");
         PreferenceConnector()
-            .setString(PreferenceConnector.USER_TYPE, 'STUDENT');
+            .setString(PreferenceConnector.USER_ID, result.user!.uid);
         return true;
       }
     } on auth.FirebaseAuthException catch (exception, s) {
@@ -54,13 +54,15 @@ class FirebaseUtilities {
   }
 
   static Future<bool> createStudent(Student student) async {
-    await firestore.collection('STUDENT').doc().set(student.toJson()).then(
-        (document) {
-      return true;
-    }, onError: (e, s) {
-      return false;
-    });
-    return true;
+    bool returunVal = false;
+    try {
+      print(student.toJson());
+      await firestore.collection('STUDENTS').doc().set(student.toJson());
+      returunVal = true;
+    } catch (e) {
+      print(e.toString());
+    }
+    return returunVal;
   }
 
   static Future<bool> _saveStudentData(User user) async {
@@ -125,5 +127,42 @@ class FirebaseUtilities {
       print(e.toString());
     }
     return downloadUrl;
+  }
+
+  static Future<Student?> getStudentDataByEmail(String emailId) async {
+    User? user;
+    Student? student;
+
+    user = await getUser(emailId);
+    if (user != null) {
+      try {
+        QuerySnapshot<Map<String, dynamic>> result = await firestore
+            .collection("STUDENTS")
+            .where("uid", isEqualTo: user.userId)
+            .get();
+        if (result.docs.length > 0) {
+          student = Student.fromJson(result.docs[0].data());
+        }
+      } catch (e) {
+        print(e.toString());
+      }
+      return student;
+    }
+  }
+
+  static Future<Student?> getStudentDataById(String id) async {
+    Student? student;
+
+    try {
+      QuerySnapshot<Map<String, dynamic>> result = await firestore
+          .collection("STUDENTS")
+          .where("id", isEqualTo: id)
+          .get();
+      if (result.docs.length > 0) {
+        student = Student.fromJson(result.docs[0].data());
+      }
+    } catch (e) {
+      print(e.toString());
+    }
   }
 }

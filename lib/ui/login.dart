@@ -86,8 +86,11 @@ class _LoginState extends State<Login> {
             Navigator.pushReplacement(
                 context, MaterialPageRoute(builder: (context) => AdminMenu()));
           } else if (user.userType == 'STUDENT') {
-            Navigator.pushReplacement(context,
-                MaterialPageRoute(builder: (context) => StudentHome()));
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        StudentHome(email: _userIdController.text.trim())));
           } else {
             await showDialog(
                 context: context,
