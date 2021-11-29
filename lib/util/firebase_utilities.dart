@@ -165,4 +165,21 @@ class FirebaseUtilities {
       print(e.toString());
     }
   }
+
+  static Future<Adviser?> addAdviser(Adviser adviser) async {
+    try {
+      DocumentReference docRef =
+          await firestore.collection('ADVISERS').add(adviser.toJson());
+      return Adviser(
+          id: docRef.id,
+          firstName: adviser.firstName,
+          lastName: adviser.lastName,
+          middleName: adviser.middleName,
+          classes: adviser.classes,
+          photoURL: adviser.photoURL);
+    } catch (e) {
+      print('Error adding adviser: ' + e.toString());
+      return null;
+    }
+  }
 }

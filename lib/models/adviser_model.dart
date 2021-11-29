@@ -3,7 +3,7 @@ class Adviser {
   String firstName;
   String lastName;
   String middleName;
-  String photoURL;
+  String? photoURL;
   List<String>? classes;
 
   Adviser(
@@ -11,13 +11,23 @@ class Adviser {
       required this.firstName,
       required this.lastName,
       required this.middleName,
-      required this.photoURL,
+      this.photoURL,
       this.classes});
+
+  Map<String, dynamic> toJson() {
+    return {
+      'first_name': this.firstName,
+      'last_name': this.lastName,
+      'middle_name': this.middleName,
+      'id': this.id,
+      'photo_url': this.photoURL,
+      'classes': this.classes
+    };
+  }
 
   static Adviser fromMap(Map<String, dynamic> adviserData) {
     List<String> classList = [];
     if (adviserData['classes'] != null) {
-      // classList = adviserData['classes'];
       if (classList is List) {
         classList.forEach((value) {
           classList.add(value.toString());
