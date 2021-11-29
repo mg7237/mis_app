@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:mis_app/models/student_model.dart';
 import 'package:mis_app/models/user_model.dart';
 import 'package:mis_app/models/adviser_model.dart';
+import 'package:mis_app/models/course_model.dart';
 import 'package:mis_app/util/preference_connector.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -21,10 +22,33 @@ class FirebaseUtilities {
           .createUserWithEmailAndPassword(email: email, password: password);
       print('creds: ' + (result.user?.uid ?? 'Fail'));
       if ((result.user?.uid ?? '') != '') {
-        _saveStudentData(
+        _saveUserData(
             User(email: email, userId: result.user!.uid, userType: 'STUDENT'));
         PreferenceConnector()
             .setString(PreferenceConnector.USER_TYPE, "STUDENT");
+        PreferenceConnector()
+            .setString(PreferenceConnector.USER_ID, result.user!.uid);
+        return true;
+      }
+    } on auth.FirebaseAuthException catch (exception, s) {
+      print(exception.toString() + '$s');
+    } catch (e, s) {
+      print(e.toString() + '$s');
+    }
+    return false;
+  }
+
+  static Future<bool> createAdminWithEmailAndPassword(
+      {required String email, required String password}) async {
+    try {
+      print('FireStoreUtils.createUserWithEmailAndPassword');
+      auth.UserCredential result = await firebaseInstance
+          .createUserWithEmailAndPassword(email: email, password: password);
+      print('creds: ' + (result.user?.uid ?? 'Fail'));
+      if ((result.user?.uid ?? '') != '') {
+        _saveUserData(
+            User(email: email, userId: result.user!.uid, userType: 'ADMIN'));
+        PreferenceConnector().setString(PreferenceConnector.USER_TYPE, "ADMIN");
         PreferenceConnector()
             .setString(PreferenceConnector.USER_ID, result.user!.uid);
         return true;
@@ -65,7 +89,19 @@ class FirebaseUtilities {
     return returunVal;
   }
 
-  static Future<bool> _saveStudentData(User user) async {
+  static Future<bool> createCourse(Course course) async {
+    bool returunVal = false;
+    try {
+      print(course.toJson());
+      await firestore.collection('COURSES').doc().set(course.toJson());
+      returunVal = true;
+    } catch (e) {
+      print(e.toString());
+    }
+    return returunVal;
+  }
+
+  static Future<bool> _saveUserData(User user) async {
     await firestore.collection('USERS').doc().set(user.toJson()).then(
         (document) {
       return true;
