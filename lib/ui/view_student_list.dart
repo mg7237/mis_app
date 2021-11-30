@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:mis_app/providers/theme_manager.dart';
 import 'package:mis_app/ui/view_student.dart';
+import 'package:mis_app/util/firebase_utilities.dart';
 
 class StudentList extends StatefulWidget {
   const StudentList({Key? key}) : super(key: key);
@@ -11,7 +12,18 @@ class StudentList extends StatefulWidget {
 }
 
 class _StudentListState extends State<StudentList> {
-  List<String> students = ['John Doe', 'Jane Doe', 'Juan Doe'];
+  List<String> students = [];
+
+  @override
+  void initState() {
+    super.initState();
+    getStudents();
+  }
+
+  Future getStudents() async {
+    students = await FirebaseUtilities.getStudentList();
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -48,7 +48,7 @@ class _AddAdminState extends State<AddAdmin> {
                                       InputDecoration(hintText: 'User Id'),
                                   controller: userIdController,
                                   style: TextStyle(fontSize: 14),
-                                  keyboardType: TextInputType.name,
+                                  keyboardType: TextInputType.emailAddress,
                                   validator: (String? value) {
                                     if (value == null || value == '') {
                                       return 'Please enter User Id';

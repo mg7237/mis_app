@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mis_app/util/firebase_utilities.dart';
 import 'package:provider/provider.dart';
 import 'package:mis_app/providers/theme_manager.dart';
 
@@ -10,7 +11,18 @@ class AdminList extends StatefulWidget {
 }
 
 class _AdminListState extends State<AdminList> {
-  List<String> admins = ['admin 1', 'admin 2', 'admin 3'];
+  List<String> admins = [];
+
+  @override
+  void initState() {
+    super.initState();
+    getAdmins();
+  }
+
+  Future getAdmins() async {
+    admins = await FirebaseUtilities.getAdminList();
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -13,7 +13,7 @@ class User {
     };
   }
 
-  static User fromJson(Map<String, dynamic> json) {
+  static User fromMap(Map<String, dynamic> json) {
     return User(
         email: json['email'],
         userId: json['userId'],

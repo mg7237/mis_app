@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mis_app/util/firebase_utilities.dart';
 import 'package:provider/provider.dart';
 import 'package:mis_app/providers/theme_manager.dart';
 import 'package:mis_app/ui/view_adviser.dart';
@@ -11,7 +12,18 @@ class AdviserList extends StatefulWidget {
 }
 
 class _AdviserListState extends State<AdviserList> {
-  List<String> advisers = ['John Doe', 'Jane Doe', 'Juan Doe'];
+  List<String> advisers = [];
+
+  @override
+  void initState() {
+    super.initState();
+    getAdviserList();
+  }
+
+  Future getAdviserList() async {
+    advisers = await FirebaseUtilities.getAdviserList();
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -14,6 +14,13 @@ class FirebaseUtilities {
   static var firebaseInstance = auth.FirebaseAuth.instance;
   static FirebaseFirestore firestore = FirebaseFirestore.instance;
 
+  static String fullName(
+      {required String firstName,
+      required String lastName,
+      required String middleName}) {
+    return (lastName + ' ' + firstName + ' ' + middleName);
+  }
+
   static Future<bool> createUserWithEmailAndPassword(
       {required String email, required String password}) async {
     try {
@@ -136,7 +143,7 @@ class FirebaseUtilities {
           .where("email", isEqualTo: emailId)
           .get();
       if (result.docs.length > 0) {
-        user = User.fromJson(result.docs[0].data());
+        user = User.fromMap(result.docs[0].data());
       }
     } catch (e) {
       print(e.toString());
@@ -217,5 +224,66 @@ class FirebaseUtilities {
       print('Error adding adviser: ' + e.toString());
       return null;
     }
+  }
+
+  static Future<List<String>> getAdviserList() async {
+    List<String> returnList = [];
+    try {
+      QuerySnapshot<Map<String, dynamic>> result =
+          await firestore.collection("ADVISERS").get();
+      if (result.docs.length > 0) {
+        result.docs.forEach((element) {
+          Adviser adviser = Adviser.fromMap(element.data());
+
+          returnList.add(fullName(
+              firstName: adviser.firstName,
+              lastName: adviser.lastName,
+              middleName: adviser.middleName));
+        });
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+    return returnList;
+  }
+
+  static Future<List<String>> getAdminList() async {
+    List<String> returnList = [];
+    try {
+      QuerySnapshot<Map<String, dynamic>> result = await firestore
+          .collection("USERS")
+          .where("userType", isEqualTo: 'ADMIN')
+          .get();
+      if (result.docs.length > 0) {
+        result.docs.forEach((element) {
+          User user = User.fromMap(element.data());
+          returnList.add(user.email);
+        });
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+    return returnList;
+  }
+
+  static Future<List<String>> getStudentList() async {
+    List<String> returnList = [];
+    try {
+      QuerySnapshot<Map<String, dynamic>> result =
+          await firestore.collection("STUDENTS").get();
+      if (result.docs.length > 0) {
+        result.docs.forEach((element) {
+          Student student = Student.fromJson(element.data());
+
+          returnList.add(fullName(
+              firstName: student.firstName,
+              lastName: student.lastName,
+              middleName: student.middleName));
+        });
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+    return returnList;
   }
 }
