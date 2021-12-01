@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:mis_app/models/course_model.dart';
 import 'package:mis_app/ui/view_course.dart';
 import 'package:provider/provider.dart';
 import 'package:mis_app/providers/theme_manager.dart';
 import 'package:mis_app/models/student_model.dart';
 import 'package:mis_app/util/constants.dart';
+import 'package:mis_app/util/firebase_utilities.dart';
 
 class ViewCourseList extends StatefulWidget {
   const ViewCourseList({Key? key}) : super(key: key);
@@ -15,9 +17,153 @@ class ViewCourseList extends StatefulWidget {
 
 class _ViewCourseListState extends State<ViewCourseList> {
   late Student student;
+  List<TableRow> tableRows = [];
   String _selectedSemester = 'Semester 1 2021-2022';
-
+  List<Course> courses = [];
   int index = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    getCourseList();
+  }
+
+  Future getCourseList() async {
+    courses = await FirebaseUtilities.getCourseList();
+    tableRows = [
+      TableRow(
+          decoration: BoxDecoration(
+              color: Colors.grey[300], border: Border.all(width: 1.5)),
+          children: [
+            Container(
+              height: 40,
+              decoration:
+                  BoxDecoration(border: Border(right: BorderSide(width: 1.5))),
+              child: Center(
+                child: Text(
+                  'Course Code',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                ),
+              ),
+            ),
+            Container(
+              height: 40,
+              decoration:
+                  BoxDecoration(border: Border(right: BorderSide(width: 1.5))),
+              child: Center(
+                child: Text(
+                  'Course Name',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                ),
+              ),
+            ),
+            Container(
+              height: 40,
+              decoration:
+                  BoxDecoration(border: Border(right: BorderSide(width: 1.5))),
+              child: Center(
+                child: Text(
+                  'No. Of Units',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                ),
+              ),
+            ),
+            Container(
+              height: 40,
+              decoration:
+                  BoxDecoration(border: Border(right: BorderSide(width: 1.5))),
+              child: Center(
+                child: Text(
+                  'Adviser',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                ),
+              ),
+            ),
+            Container(
+              width: 30,
+              height: 40,
+              decoration:
+                  BoxDecoration(border: Border(right: BorderSide(width: 1.5))),
+              child: Center(),
+            ),
+          ])
+    ];
+
+    if (courses.isNotEmpty) {
+      courses.forEach((element) {
+        tableRows.add(TableRow(
+            decoration: BoxDecoration(border: Border.all(width: 1.5)),
+            children: [
+              Container(
+                height: 40,
+                decoration: BoxDecoration(
+                    border: Border(right: BorderSide(width: 1.5))),
+                child: Center(
+                  child: Text(
+                    element.code,
+                    style: TextStyle(
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+              ),
+              Container(
+                height: 40,
+                decoration: BoxDecoration(
+                    border: Border(right: BorderSide(width: 1.5))),
+                child: Center(
+                  child: Text(
+                    element.name,
+                    style: TextStyle(
+                      fontSize: 10,
+                    ),
+                  ),
+                ),
+              ),
+              Container(
+                height: 40,
+                decoration: BoxDecoration(
+                    border: Border(right: BorderSide(width: 1.5))),
+                child: Center(
+                  child: Text(
+                    element.unitsCount,
+                    style: TextStyle(
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+              ),
+              Container(
+                height: 40,
+                decoration: BoxDecoration(
+                    border: Border(right: BorderSide(width: 1.5))),
+                child: Center(
+                  child: Text(
+                    element.instructorName ?? '',
+                    style: TextStyle(
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+              ),
+              Container(
+                height: 40,
+                width: 40,
+                decoration: BoxDecoration(
+                    border: Border(right: BorderSide(width: 1.5))),
+                child: Center(
+                    child: IconButton(
+                        onPressed: () => Navigator.of(context).push(
+                            MaterialPageRoute(
+                                builder: (context) => ViewCourse())),
+                        icon: Icon(Icons.arrow_forward_ios_sharp))),
+              ),
+            ]));
+      });
+    }
+
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -96,234 +242,7 @@ class _ViewCourseListState extends State<ViewCourseList> {
                             3: FixedColumnWidth(width * 30 / 100),
                             4: FixedColumnWidth(width * 10 / 100),
                           },
-                          children: [
-                            TableRow(
-                                decoration: BoxDecoration(
-                                    color: Colors.grey[300],
-                                    border: Border.all(width: 1.5)),
-                                children: [
-                                  Container(
-                                    height: 40,
-                                    decoration: BoxDecoration(
-                                        border: Border(
-                                            right: BorderSide(width: 1.5))),
-                                    child: Center(
-                                      child: Text(
-                                        'Course Code',
-                                        style: TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w600),
-                                      ),
-                                    ),
-                                  ),
-                                  Container(
-                                    height: 40,
-                                    decoration: BoxDecoration(
-                                        border: Border(
-                                            right: BorderSide(width: 1.5))),
-                                    child: Center(
-                                      child: Text(
-                                        'Course Name',
-                                        style: TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w600),
-                                      ),
-                                    ),
-                                  ),
-                                  Container(
-                                    height: 40,
-                                    decoration: BoxDecoration(
-                                        border: Border(
-                                            right: BorderSide(width: 1.5))),
-                                    child: Center(
-                                      child: Text(
-                                        'No. Of Units',
-                                        style: TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w600),
-                                      ),
-                                    ),
-                                  ),
-                                  Container(
-                                    height: 40,
-                                    decoration: BoxDecoration(
-                                        border: Border(
-                                            right: BorderSide(width: 1.5))),
-                                    child: Center(
-                                      child: Text(
-                                        'Adviser',
-                                        style: TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w600),
-                                      ),
-                                    ),
-                                  ),
-                                  Container(
-                                    width: 30,
-                                    height: 40,
-                                    decoration: BoxDecoration(
-                                        border: Border(
-                                            right: BorderSide(width: 1.5))),
-                                    child: Center(),
-                                  ),
-                                ]),
-                            TableRow(
-                                decoration: BoxDecoration(
-                                    // color: Colors.grey[300],
-                                    border: Border.all(width: 1.5)),
-                                children: [
-                                  Container(
-                                    height: 40,
-                                    decoration: BoxDecoration(
-                                        border: Border(
-                                            right: BorderSide(width: 1.5))),
-                                    child: Center(
-                                      child: Text(
-                                        'KAS 1',
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Container(
-                                    height: 40,
-                                    decoration: BoxDecoration(
-                                        border: Border(
-                                            right: BorderSide(width: 1.5))),
-                                    child: Center(
-                                      child: Text(
-                                        'Kasa Yasaysayan',
-                                        style: TextStyle(
-                                          fontSize: 10,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Container(
-                                    height: 40,
-                                    decoration: BoxDecoration(
-                                        border: Border(
-                                            right: BorderSide(width: 1.5))),
-                                    child: Center(
-                                      child: Text(
-                                        '3',
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Container(
-                                    height: 40,
-                                    decoration: BoxDecoration(
-                                        border: Border(
-                                            right: BorderSide(width: 1.5))),
-                                    child: Center(
-                                      child: Text(
-                                        'Jon, Doe',
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Container(
-                                    height: 40,
-                                    width: 40,
-                                    decoration: BoxDecoration(
-                                        border: Border(
-                                            right: BorderSide(width: 1.5))),
-                                    child: Center(
-                                        child: IconButton(
-                                            onPressed: () =>
-                                                Navigator.of(context).push(
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            ViewCourse())),
-                                            icon: Icon(Icons
-                                                .arrow_forward_ios_sharp))),
-                                  ),
-                                ]),
-                            TableRow(
-                                decoration: BoxDecoration(
-                                    // color: Colors.grey[300],
-                                    border: Border.all(width: 1.5)),
-                                children: [
-                                  Container(
-                                    height: 40,
-                                    decoration: BoxDecoration(
-                                        border: Border(
-                                            right: BorderSide(width: 1.5))),
-                                    child: Center(
-                                      child: Text(
-                                        'PE 1',
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Container(
-                                    height: 40,
-                                    decoration: BoxDecoration(
-                                        border: Border(
-                                            right: BorderSide(width: 1.5))),
-                                    child: Center(
-                                      child: Text(
-                                        'Physical Education',
-                                        style: TextStyle(
-                                          fontSize: 10,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Container(
-                                    height: 40,
-                                    decoration: BoxDecoration(
-                                        border: Border(
-                                            right: BorderSide(width: 1.5))),
-                                    child: Center(
-                                      child: Text(
-                                        '5',
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Container(
-                                    height: 40,
-                                    decoration: BoxDecoration(
-                                        border: Border(
-                                            right: BorderSide(width: 1.5))),
-                                    child: Center(
-                                      child: Text(
-                                        'Jane, Doe',
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Container(
-                                    height: 40,
-                                    width: 40,
-                                    decoration: BoxDecoration(
-                                        border: Border(
-                                            right: BorderSide(width: 1.5))),
-                                    child: Center(
-                                        child: IconButton(
-                                            onPressed: () =>
-                                                Navigator.of(context).push(
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            ViewCourse())),
-                                            icon: Icon(Icons
-                                                .arrow_forward_ios_sharp))),
-                                  ),
-                                ])
-                          ],
+                          children: tableRows,
                         )
                       ],
                     ),

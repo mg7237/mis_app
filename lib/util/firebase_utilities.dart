@@ -286,4 +286,22 @@ class FirebaseUtilities {
     }
     return returnList;
   }
+
+  static Future<List<Course>> getCourseList() async {
+    List<Course> returnList = [];
+    try {
+      QuerySnapshot<Map<String, dynamic>> result =
+          await firestore.collection("COURSES").get();
+      if (result.docs.length > 0) {
+        result.docs.forEach((element) {
+          Course course = Course.fromJson(element.data());
+
+          returnList.add(course);
+        });
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+    return returnList;
+  }
 }

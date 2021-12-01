@@ -23,4 +23,14 @@ class Course {
       'units_count': this.unitsCount
     };
   }
+
+  static Course fromJson(Map<String, dynamic> json) {
+    return Course(
+        id: 'id',
+        code: json['code'] ?? '',
+        name: json['name'] ?? '',
+        unitsCount: json['units_count'] ?? '',
+        currentSemester: json['current_semester'],
+        instructorName: json['instructor_name']);
+  }
 }
