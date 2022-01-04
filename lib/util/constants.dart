@@ -48,3 +48,5 @@ List<String> semesters = [
   'Semester 2 2019-20',
   'Semester 1 2019-2020',
 ];
+
+List<String> classes = ['KAS', 'WIKA', 'ETHICS', 'PE'];

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:mis_app/providers/theme_manager.dart';
 import 'package:mis_app/util/firebase_utilities.dart';
 import 'package:mis_app/models/course_model.dart';
+import 'package:mis_app/util/constants.dart';
 
 class AddCourse extends StatefulWidget {
   const AddCourse({Key? key}) : super(key: key);
@@ -12,13 +13,40 @@ class AddCourse extends StatefulWidget {
 }
 
 class _AddCourseState extends State<AddCourse> {
+  String defaultDropdownValue = 'Select';
+  List<String> advisers = [];
+  String _selectedSemester = semesters[0];
+  String _selectedAdviser = '';
+
+  List<DropdownMenuItem<String>> advisersDropDown = [];
   TextEditingController shortCodeController = TextEditingController();
   TextEditingController courseNameController = TextEditingController();
   TextEditingController numberOfUnitsController = TextEditingController();
   static final addCourseKey = GlobalKey<FormState>();
+
   @override
   void initState() {
     super.initState();
+
+    getAdviserList();
+  }
+
+  Future getAdviserList() async {
+    advisers = await FirebaseUtilities.getAdviserList();
+    advisersDropDown = [];
+    if (advisers.length > 0) {
+      advisers.forEach((adviserName) {
+        advisersDropDown.add(DropdownMenuItem(
+            child: Text(
+              adviserName,
+              style: TextStyle(fontSize: 14),
+            ),
+            value: adviserName));
+      });
+
+      _selectedAdviser = advisers[0];
+    }
+    setState(() {});
   }
 
   @override
@@ -87,6 +115,64 @@ class _AddCourseState extends State<AddCourse> {
                                   },
                                 ),
                               ),
+                              Container(
+                                width: MediaQuery.of(context).size.width,
+                                child: DropdownButton(
+                                  value: _selectedSemester,
+                                  onChanged: (String? value) {
+                                    _selectedSemester = value ?? semesters[0];
+                                    setState(() {});
+                                  },
+                                  items: [
+                                    DropdownMenuItem(
+                                        child: Text(
+                                          semesters[0],
+                                          style: TextStyle(fontSize: 14),
+                                        ),
+                                        value: semesters[0]),
+                                    DropdownMenuItem(
+                                        child: Text(
+                                          semesters[1],
+                                          style: TextStyle(fontSize: 14),
+                                        ),
+                                        value: semesters[1]),
+                                    DropdownMenuItem(
+                                        child: Text(
+                                          semesters[2],
+                                          style: TextStyle(fontSize: 14),
+                                        ),
+                                        value: semesters[2]),
+                                    DropdownMenuItem(
+                                        child: Text(
+                                          semesters[3],
+                                          style: TextStyle(fontSize: 14),
+                                        ),
+                                        value: semesters[3]),
+                                    DropdownMenuItem(
+                                        child: Text(
+                                          semesters[4],
+                                          style: TextStyle(fontSize: 14),
+                                        ),
+                                        value: semesters[4]),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              advisersDropDown.length > 0
+                                  ? Container(
+                                      width: MediaQuery.of(context).size.width,
+                                      child: DropdownButton(
+                                        value: _selectedAdviser,
+                                        onChanged: (String? value) {
+                                          _selectedAdviser = value ?? '';
+                                          setState(() {});
+                                        },
+                                        items: advisersDropDown,
+                                      ),
+                                    )
+                                  : SizedBox(),
                               SizedBox(height: 30),
                               Row(
                                 mainAxisAlignment:
@@ -113,6 +199,8 @@ class _AddCourseState extends State<AddCourse> {
                                           shortCodeController.text = '';
                                           courseNameController.text = '';
                                           numberOfUnitsController.text = '';
+                                          _selectedAdviser = advisers[0];
+                                          _selectedSemester = semesters[0];
                                           setState(() {});
                                         },
                                       )),
@@ -146,7 +234,11 @@ class _AddCourseState extends State<AddCourse> {
                                                         .text,
                                                     unitsCount:
                                                         numberOfUnitsController
-                                                            .text))) {
+                                                            .text,
+                                                    currentSemester:
+                                                        _selectedSemester,
+                                                    instructorName:
+                                                        _selectedAdviser))) {
                                               await showDialog(
                                                   context: context,
                                                   builder: (BuildContext

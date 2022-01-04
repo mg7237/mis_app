@@ -60,7 +60,9 @@ class _AdviserListState extends State<AdviserList> {
                                           Navigator.of(context).push(
                                               MaterialPageRoute(
                                                   builder: (context) =>
-                                                      ViewAdviser()));
+                                                      ViewAdviser(
+                                                          advisorName:
+                                                              advisers[i])));
                                         }),
                                   ],
                                 ),

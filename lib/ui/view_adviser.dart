@@ -3,7 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:mis_app/providers/theme_manager.dart';
 
 class ViewAdviser extends StatefulWidget {
-  const ViewAdviser({Key? key}) : super(key: key);
+  final String advisorName;
+  const ViewAdviser({required this.advisorName, key}) : super(key: key);
 
   @override
   _ViewAdviserState createState() => _ViewAdviserState();
