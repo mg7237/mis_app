@@ -55,7 +55,7 @@ class _CreateUserState extends State<CreateUser> {
           _userIdController.text.trim() == '') {
         return;
       }
-      if (_passwordController.text == _confirmPasswordController.text) {
+      if (_passwordController.text != _confirmPasswordController.text) {
         await showDialog(
             context: context,
             builder: (BuildContext context) => AlertDialog(

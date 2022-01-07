@@ -287,16 +287,79 @@ class FirebaseUtilities {
     return returnList;
   }
 
-  static Future<List<Course>> getCourseList() async {
+  static Future<List<Course>> getCourseListBySemester(String semester) async {
     List<Course> returnList = [];
     try {
-      QuerySnapshot<Map<String, dynamic>> result =
-          await firestore.collection("COURSES").get();
+      QuerySnapshot<Map<String, dynamic>> result = await firestore
+          .collection("COURSES")
+          .where('current_semester', isEqualTo: semester)
+          .get();
       if (result.docs.length > 0) {
         result.docs.forEach((element) {
           Course course = Course.fromJson(element.data());
 
           returnList.add(course);
+        });
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+    return returnList;
+  }
+
+  static Future<List<Course>> getClassListByAdvisor(String advisorName) async {
+    List<Course> returnList = [];
+    try {
+      QuerySnapshot<Map<String, dynamic>> result = await firestore
+          .collection("COURSES")
+          .where('instructor_name', isEqualTo: advisorName)
+          .get();
+      if (result.docs.length > 0) {
+        result.docs.forEach((element) {
+          Course course = Course.fromJson(element.data());
+
+          returnList.add(course);
+        });
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+    return returnList;
+  }
+
+  static Future<List<String>> getStudentListByClass(String className) async {
+    List<String> returnList = [];
+    try {
+      QuerySnapshot<Map<String, dynamic>> result = await firestore
+          .collection("STUDENTS")
+          .where('program', isEqualTo: className)
+          .get();
+      if (result.docs.length > 0) {
+        result.docs.forEach((element) {
+          Student student = Student.fromJson(element.data());
+          returnList.add(fullName(
+              firstName: student.firstName,
+              middleName: student.middleName,
+              lastName: student.lastName));
+        });
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+    return returnList;
+  }
+
+  static Future<List<String>> getCourseListByFaculty(String faculty) async {
+    List<String> returnList = [];
+    try {
+      QuerySnapshot<Map<String, dynamic>> result = await firestore
+          .collection("COURSES")
+          .where('faculty', isEqualTo: faculty)
+          .get();
+      if (result.docs.length > 0) {
+        result.docs.forEach((element) {
+          Course course = Course.fromJson(element.data());
+          returnList.add(course.name);
         });
       }
     } catch (e) {

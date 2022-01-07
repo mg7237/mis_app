@@ -74,11 +74,11 @@ class _RegisterSudentState extends State<RegisterSudent> {
   _getAdvisers() async {
     List<Adviser> adviserData = await FirebaseUtilities.getAdvisers();
     adviserData.forEach((element) {
-      advisers.add(element.lastName +
-          ',' +
-          element.firstName +
-          ' ' +
-          element.middleName);
+      advisers.add(FirebaseUtilities.fullName(
+          firstName: element.firstName,
+          lastName: element.lastName,
+          middleName: element.middleName));
+      ;
     });
     items = _getMenuItems();
     setState(() {});
@@ -114,6 +114,7 @@ class _RegisterSudentState extends State<RegisterSudent> {
 
   void updateFacultyDropdown(String? selectedAcademicLevel) {
     if (selectedAcademicLevel == null) return;
+    facultyList = [];
     List<String> faculties = academicData[selectedAcademicLevel]!.keys.toList();
     faculties.forEach((element) {
       facultyList.add(DropdownMenuItem(
@@ -214,16 +215,19 @@ class _RegisterSudentState extends State<RegisterSudent> {
     }
   }
 
-  void updateCourseDropdown(String? selectedFaculty) {
-    if (selectedFaculty == null) return;
-    List<String>? courses =
-        academicData[_selectedAcademicLevel]![selectedFaculty];
-    courses?.forEach((element) {
+  void updateCourseDropdown(String selectedFaculty) async {
+    courseList = [];
+    List<String> courses =
+        await FirebaseUtilities.getCourseListByFaculty(selectedFaculty);
+    if (courses.length == 0) return;
+
+    courses.forEach((element) {
       courseList.add(DropdownMenuItem(
           child: Text(element,
               overflow: TextOverflow.fade, style: TextStyle(fontSize: 14)),
           value: element));
     });
+    setState(() {});
   }
 
   @override
@@ -518,8 +522,8 @@ class _RegisterSudentState extends State<RegisterSudent> {
                                   value: _selectedFaculty,
                                   onChanged: (String? value) {
                                     _selectedFaculty = value ?? '';
-                                    updateCourseDropdown(_selectedFaculty);
-                                    setState(() {});
+                                    updateCourseDropdown(
+                                        _selectedFaculty ?? '');
                                   },
                                   items: facultyList),
                             ),
@@ -538,19 +542,19 @@ class _RegisterSudentState extends State<RegisterSudent> {
                                   items: courseList),
                             ),
                             SizedBox(height: 10),
-                            Container(
-                              padding: EdgeInsets.only(right: 10),
-                              width: MediaQuery.of(context).size.width,
-                              child: DropdownButtonFormField<String>(
-                                  value: _selectedAdviser,
-                                  onChanged: (String? value) {
-                                    _selectedAdviser = value.toString();
-                                    setState(() {});
-                                  },
-                                  hint: Text('Select Adviser',
-                                      style: TextStyle(fontSize: 14)),
-                                  items: items),
-                            ),
+                            // Container(
+                            //   padding: EdgeInsets.only(right: 10),
+                            //   width: MediaQuery.of(context).size.width,
+                            //   child: DropdownButtonFormField<String>(
+                            //       value: _selectedAdviser,
+                            //       onChanged: (String? value) {
+                            //         _selectedAdviser = value.toString();
+                            //         setState(() {});
+                            //       },
+                            //       hint: Text('Select Adviser',
+                            //           style: TextStyle(fontSize: 14)),
+                            //       items: items),
+                            // ),
                             SizedBox(height: 30),
                             Container(
                               width: MediaQuery.of(context).size.width - 50,

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:mis_app/providers/theme_manager.dart';
+import 'package:mis_app/util/firebase_utilities.dart';
+import 'package:mis_app/models/course_model.dart';
+import 'package:mis_app/models/student_model.dart';
 
 class ViewAdviser extends StatefulWidget {
   final String advisorName;
@@ -32,6 +35,27 @@ class _ViewAdviserState extends State<ViewAdviser> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    getClassList();
+  }
+
+  Future<void> getClassList() async {
+    classes = {};
+    List<Course> courses =
+        await FirebaseUtilities.getClassListByAdvisor(widget.advisorName);
+    courses.forEach((Course course) async {
+      List<String> students = [];
+      students = await FirebaseUtilities.getStudentListByClass(course.name);
+      //classes.addEntries(newEntries)
+      classes[course.name] = students;
+      print(classes);
+      setState(() {});
+    });
+    print(classes);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Consumer<ThemeNotifier>(
         builder: (context, theme, _) => MaterialApp(
@@ -57,7 +81,7 @@ class _ViewAdviserState extends State<ViewAdviser> {
                                   )),
                               SizedBox(width: 20),
                               Text(
-                                'Doe Jane B.',
+                                widget.advisorName,
                                 style: TextStyle(fontSize: 18),
                               )
                             ]),

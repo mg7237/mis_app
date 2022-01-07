@@ -15,9 +15,11 @@ class AddCourse extends StatefulWidget {
 class _AddCourseState extends State<AddCourse> {
   String defaultDropdownValue = 'Select';
   List<String> advisers = [];
-  String _selectedSemester = semesters[0];
-  String _selectedAdviser = '';
-
+  String? _selectedSemester;
+  String? _selectedAdviser;
+  String? _selectedAcademicLevel;
+  String? _selectedFaculty;
+  List<DropdownMenuItem<String>> facultyList = [];
   List<DropdownMenuItem<String>> advisersDropDown = [];
   TextEditingController shortCodeController = TextEditingController();
   TextEditingController courseNameController = TextEditingController();
@@ -43,10 +45,20 @@ class _AddCourseState extends State<AddCourse> {
             ),
             value: adviserName));
       });
-
-      _selectedAdviser = advisers[0];
     }
     setState(() {});
+  }
+
+  void updateFacultyDropdown(String? selectedAcademicLevel) {
+    facultyList = [];
+    if (selectedAcademicLevel == null) return;
+    List<String> faculties = academicData[selectedAcademicLevel]!.keys.toList();
+    faculties.forEach((element) {
+      facultyList.add(DropdownMenuItem(
+          child: Text(element,
+              overflow: TextOverflow.fade, style: TextStyle(fontSize: 14)),
+          value: element));
+    });
   }
 
   @override
@@ -115,10 +127,85 @@ class _AddCourseState extends State<AddCourse> {
                                   },
                                 ),
                               ),
+                              // academic level, Faculty,
+                              Container(
+                                padding: EdgeInsets.only(right: 10),
+                                width: MediaQuery.of(context).size.width,
+                                child: DropdownButtonFormField(
+                                    isExpanded: true,
+                                    value: _selectedAcademicLevel,
+                                    validator: (value) {
+                                      if (value == null || value == '') {
+                                        return ('Please select academic level');
+                                      }
+                                    },
+                                    onChanged: (String? value) {
+                                      _selectedAcademicLevel = value;
+                                      updateFacultyDropdown(
+                                          _selectedAcademicLevel);
+                                      _selectedFaculty = null;
+                                      // _selectedCourse = null;
+                                      setState(() {});
+                                    },
+                                    hint: Text('Select Academic Level',
+                                        style: TextStyle(fontSize: 14)),
+                                    items: [
+                                      DropdownMenuItem(
+                                        child: Text(
+                                          academicData.keys.toList()[0],
+                                          style: TextStyle(fontSize: 14),
+                                        ),
+                                        value: academicData.keys.toList()[0],
+                                      ),
+                                      DropdownMenuItem(
+                                          child: Text(
+                                              academicData.keys.toList()[1],
+                                              style: TextStyle(fontSize: 14)),
+                                          value: academicData.keys.toList()[1]),
+                                      DropdownMenuItem(
+                                          child: Text(
+                                              academicData.keys.toList()[2],
+                                              style: TextStyle(fontSize: 14)),
+                                          value: academicData.keys.toList()[2])
+                                    ]),
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Container(
+                                padding: EdgeInsets.only(right: 10),
+                                width: MediaQuery.of(context).size.width,
+                                child: DropdownButtonFormField<String>(
+                                    hint: Text('Select Faculty',
+                                        style: TextStyle(fontSize: 14)),
+                                    isExpanded: true,
+                                    value: _selectedFaculty,
+                                    validator: (value) {
+                                      if (value == null || value == '') {
+                                        return ('Please select faculty');
+                                      }
+                                    },
+                                    onChanged: (String? value) {
+                                      _selectedFaculty = value ?? '';
+                                      // updateCourseDropdown(_selectedFaculty);
+                                      setState(() {});
+                                    },
+                                    items: facultyList),
+                              ),
+
+                              SizedBox(height: 10),
                               Container(
                                 width: MediaQuery.of(context).size.width,
-                                child: DropdownButton(
+                                child: DropdownButtonFormField<String>(
+                                  hint: Text('Select Semester',
+                                      style: TextStyle(fontSize: 14)),
                                   value: _selectedSemester,
+                                  isExpanded: true,
+                                  validator: (value) {
+                                    if (value == null || value == '') {
+                                      return ('Please select semester');
+                                    }
+                                  },
                                   onChanged: (String? value) {
                                     _selectedSemester = value ?? semesters[0];
                                     setState(() {});
@@ -157,23 +244,29 @@ class _AddCourseState extends State<AddCourse> {
                                   ],
                                 ),
                               ),
-                              SizedBox(
-                                height: 10,
-                              ),
+                              SizedBox(height: 10),
                               advisersDropDown.length > 0
                                   ? Container(
                                       width: MediaQuery.of(context).size.width,
-                                      child: DropdownButton(
+                                      child: DropdownButtonFormField(
+                                        hint: Text('Select Adviser',
+                                            style: TextStyle(fontSize: 14)),
                                         value: _selectedAdviser,
+                                        isExpanded: true,
                                         onChanged: (String? value) {
                                           _selectedAdviser = value ?? '';
                                           setState(() {});
+                                        },
+                                        validator: (value) {
+                                          if (value == null || value == '') {
+                                            return ('Please select adviser');
+                                          }
                                         },
                                         items: advisersDropDown,
                                       ),
                                     )
                                   : SizedBox(),
-                              SizedBox(height: 30),
+                              SizedBox(height: 50),
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
@@ -236,9 +329,13 @@ class _AddCourseState extends State<AddCourse> {
                                                         numberOfUnitsController
                                                             .text,
                                                     currentSemester:
-                                                        _selectedSemester,
+                                                        _selectedSemester ?? '',
                                                     instructorName:
-                                                        _selectedAdviser))) {
+                                                        _selectedAdviser ?? '',
+                                                    academicLevel:
+                                                        _selectedAcademicLevel!,
+                                                    faculty:
+                                                        _selectedFaculty!))) {
                                               await showDialog(
                                                   context: context,
                                                   builder: (BuildContext

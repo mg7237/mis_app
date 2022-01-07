@@ -24,13 +24,10 @@ class _StudentHomeState extends State<StudentHome> {
     Student? student =
         await FirebaseUtilities.getStudentDataByEmail(widget.email);
     if (student != null) {
-      _studentName = student.lastName +
-          ' ' +
-          ' ' +
-          student.middleName +
-          ' ' +
-          student.firstName +
-          ' ';
+      _studentName = FirebaseUtilities.fullName(
+          firstName: student.firstName,
+          lastName: student.lastName,
+          middleName: student.middleName);
       setState(() {});
     }
   }

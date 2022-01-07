@@ -29,7 +29,8 @@ class _ViewCourseListState extends State<ViewCourseList> {
   }
 
   Future getCourseList() async {
-    courses = await FirebaseUtilities.getCourseList();
+    courses =
+        await FirebaseUtilities.getCourseListBySemester(_selectedSemester);
     tableRows = [
       TableRow(
           decoration: BoxDecoration(
@@ -139,7 +140,7 @@ class _ViewCourseListState extends State<ViewCourseList> {
                     border: Border(right: BorderSide(width: 1.5))),
                 child: Center(
                   child: Text(
-                    element.instructorName ?? '',
+                    element.instructorName,
                     style: TextStyle(
                       fontSize: 12,
                     ),
@@ -192,8 +193,9 @@ class _ViewCourseListState extends State<ViewCourseList> {
                                 )),
                             DropdownButton(
                               value: _selectedSemester,
-                              onChanged: (String? value) {
+                              onChanged: (String? value) async {
                                 _selectedSemester = value ?? semesters[0];
+                                await getCourseList();
                                 setState(() {});
                               },
                               items: [
