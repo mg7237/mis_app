@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:mis_app/models/student_model.dart';
+import 'package:mis_app/models/students_score.dart';
 import 'package:mis_app/models/user_model.dart';
 import 'package:mis_app/models/adviser_model.dart';
 import 'package:mis_app/models/course_model.dart';
@@ -266,8 +267,8 @@ class FirebaseUtilities {
     return returnList;
   }
 
-  static Future<List<String>> getStudentList() async {
-    List<String> returnList = [];
+  static Future<List<Student>> getStudentList() async {
+    List<Student> returnList = [];
     try {
       QuerySnapshot<Map<String, dynamic>> result =
           await firestore.collection("STUDENTS").get();
@@ -275,10 +276,7 @@ class FirebaseUtilities {
         result.docs.forEach((element) {
           Student student = Student.fromJson(element.data());
 
-          returnList.add(fullName(
-              firstName: student.firstName,
-              lastName: student.lastName,
-              middleName: student.middleName));
+          returnList.add(student);
         });
       }
     } catch (e) {
@@ -349,6 +347,25 @@ class FirebaseUtilities {
     return returnList;
   }
 
+  static Future<List<Student>> getStudentsByClass(String className) async {
+    List<Student> returnList = [];
+    try {
+      QuerySnapshot<Map<String, dynamic>> result = await firestore
+          .collection("STUDENTS")
+          .where('program', isEqualTo: className)
+          .get();
+      if (result.docs.length > 0) {
+        result.docs.forEach((element) {
+          Student student = Student.fromJson(element.data());
+          returnList.add(student);
+        });
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+    return returnList;
+  }
+
   static Future<List<String>> getCourseListByFaculty(String faculty) async {
     List<String> returnList = [];
     try {
@@ -366,5 +383,68 @@ class FirebaseUtilities {
       print(e.toString());
     }
     return returnList;
+  }
+
+  static Future<Course?> getClassByCourseName(String courseName) async {
+    Course? course;
+    try {
+      QuerySnapshot<Map<String, dynamic>> result = await firestore
+          .collection("COURSES")
+          .where('name', isEqualTo: courseName)
+          .get();
+      if (result.docs.length > 0) {
+        result.docs.forEach((element) {
+          course = Course.fromJson(element.data());
+        });
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+    return course;
+  }
+
+  static Future<StudentScore> getStudentsScore(
+      String courseName, String rollNumber) async {
+    late StudentScore studentScore;
+    try {
+      QuerySnapshot<Map<String, dynamic>> result = await firestore
+          .collection("STUDENTS_SCORE")
+          .where('course_name', isEqualTo: courseName)
+          .where('roll_number', isEqualTo: rollNumber)
+          .get();
+      if (result.docs.length > 0) {
+        result.docs.forEach((element) {
+          studentScore = StudentScore.fromJson(element.data());
+        });
+      } else {
+        studentScore = StudentScore(
+            rollNumber: rollNumber,
+            courseName: courseName,
+            grading: 'NA',
+            grade: 'NA',
+            gradePoints: 'NA');
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+    return studentScore;
+  }
+
+  static Future<Student?> getStudent(String rollNumber) async {
+    Student? student;
+    try {
+      QuerySnapshot<Map<String, dynamic>> result = await firestore
+          .collection("STUDENTS")
+          .where('roll_number', isEqualTo: rollNumber)
+          .get();
+      if (result.docs.length > 0) {
+        result.docs.forEach((element) {
+          student = Student.fromJson(element.data());
+        });
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+    return student;
   }
 }

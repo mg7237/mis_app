@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:mis_app/models/course_model.dart';
 import 'package:mis_app/ui/view_course.dart';
 import 'package:provider/provider.dart';
@@ -154,9 +153,11 @@ class _ViewCourseListState extends State<ViewCourseList> {
                     border: Border(right: BorderSide(width: 1.5))),
                 child: Center(
                     child: IconButton(
-                        onPressed: () => Navigator.of(context).push(
-                            MaterialPageRoute(
-                                builder: (context) => ViewCourse())),
+                        onPressed: () =>
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) => ViewCourse(
+                                      courseName: element.name,
+                                    ))),
                         icon: Icon(Icons.arrow_forward_ios_sharp))),
               ),
             ]));

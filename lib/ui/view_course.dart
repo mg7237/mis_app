@@ -1,86 +1,47 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
+import 'package:mis_app/models/student_model.dart';
+import 'package:mis_app/models/students_score.dart';
+import 'package:mis_app/util/firebase_utilities.dart';
 import 'package:provider/provider.dart';
 import 'package:mis_app/providers/theme_manager.dart';
 import 'package:mis_app/ui/view_student.dart';
+import 'package:mis_app/models/course_model.dart';
 
 class ViewCourse extends StatefulWidget {
-  const ViewCourse({Key? key}) : super(key: key);
+  final String courseName;
+  const ViewCourse({required this.courseName, key}) : super(key: key);
 
   @override
   _ViewCourseState createState() => _ViewCourseState();
 }
 
 class _ViewCourseState extends State<ViewCourse> {
-  List<Map<String, String>> courses = [
-    {
-      'name': 'Kasaysayan 1',
-      'code': 'KAS 1',
-      'current_semester': '2021-2022',
-      'instructor_name': 'Doe, Jane B.',
-      'units_count': '3'
-    },
-    {
-      'name': 'Physical Fitness 1',
-      'code': 'PE 1',
-      'semester': '2021-2022',
-      'instructor': 'Doe, John V.',
-      'units_count': '5'
-    },
-  ];
+  List<StudentScore> studentsScore = [];
+  List<Student> students = [];
+  List<Map<String, String>> studentData = [];
+  Course? course;
 
-  List<Map<String, dynamic>> students = [
-    {
-      'name': 'Moreno, Jerome A.',
-      'photo': 'google.com',
-      'roll_number': 214823,
-      'education_level': 'Undergraduate',
-      'classes': [
-        {
-          'code': 'KAS 1',
-          'grade': '8.5',
-          'grade_points': '8.345',
-          'semester': '2021-2022',
-        },
-        {
-          'code': 'PE 1',
-          'grade': '4.5',
-          'grade_points': '4.345',
-          'semester': '2021-2022',
-        }
-      ],
-    },
-    {
-      'name': 'Jon, Doe B.',
-      'photo': 'google.com',
-      'roll_number': 214823,
-      'education_level': 'Undergraduate',
-      'classes': [
-        {
-          'code': 'KAS 1',
-          'grade': '8.5',
-          'grade_points': '8.345',
-          'semester': '2021-2022',
-        },
-        {
-          'code': 'PE 1',
-          'grade': '4.5',
-          'grade_points': '4.345',
-          'semester': '2021-2022',
-        }
-      ],
-    }
-  ];
-  int expandedIndex = -1;
-// ['KAS 1', 'WIKA 1', 'ETHICS 1', 'PE 1', 'See all students']
+  @override
+  void initState() {
+    super.initState();
+    getCourseDetails();
+  }
 
-  _showListOfStudents(int i) {
-    if (expandedIndex == i) {
-      expandedIndex = -1;
-    } else {
-      expandedIndex = i;
-    }
+  Future getCourseDetails() async {
+    students = [];
+    studentData = [];
+    if (widget.courseName == '') return;
+    course = await FirebaseUtilities.getClassByCourseName(widget.courseName);
+    students = await FirebaseUtilities.getStudentsByClass(widget.courseName);
+    students.forEach((student) async {
+      StudentScore studentScore = await FirebaseUtilities.getStudentsScore(
+          widget.courseName, student.rollNumber);
+      Map<String, String> studentGrade = {};
+      studentGrade['name'] = student.lastName;
+      studentGrade['grade'] = studentScore.grade;
+      studentData.add(studentGrade);
+    });
+    print(studentData);
     setState(() {});
   }
 
@@ -97,33 +58,49 @@ class _ViewCourseState extends State<ViewCourse> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        SizedBox(height: 20),
+                        SizedBox(height: 10),
                         Text(
-                          'Doe Jane B.',
+                          (course?.instructorName == null)
+                              ? ''
+                              : course!.instructorName,
                           style: TextStyle(
                               fontSize: 28, fontWeight: FontWeight.bold),
                         ),
                         SizedBox(
-                          height: 10,
+                          height: 20,
                         ),
-                        Text(courses[0]['code'] ?? '',
-                            style: TextStyle(fontSize: 15)),
                         Row(children: [
-                          Text('Semester', style: TextStyle(fontSize: 15)),
-                          SizedBox(width: 20),
-                          Text(courses[0]['semester'] ?? '',
+                          Text('Course Code', style: TextStyle(fontSize: 15)),
+                          SizedBox(width: 10),
+                          Text(course?.code ?? '',
                               style: TextStyle(fontSize: 15))
                         ]),
+                        SizedBox(
+                          height: 10,
+                        ),
                         Row(children: [
-                          Text('Instructor', style: TextStyle(fontSize: 15)),
+                          Text('Course Name', style: TextStyle(fontSize: 15)),
                           SizedBox(width: 20),
-                          Text(courses[0]['instructor'] ?? '',
+                          Text(course?.name ?? '',
                               style: TextStyle(fontSize: 15)),
                         ]),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Row(children: [
+                          Text('Semester', style: TextStyle(fontSize: 15)),
+                          SizedBox(width: 10),
+                          Text(course?.currentSemester ?? '',
+                              style: TextStyle(fontSize: 15))
+                        ]),
+
+                        SizedBox(
+                          height: 10,
+                        ),
                         Row(children: [
                           Text('No. of units:', style: TextStyle(fontSize: 15)),
-                          SizedBox(width: 20),
-                          Text(courses[0]['units_count'] ?? '',
+                          SizedBox(width: 10),
+                          Text(course?.unitsCount ?? '',
                               style: TextStyle(fontSize: 15))
                         ]),
                         SizedBox(
@@ -165,13 +142,13 @@ class _ViewCourseState extends State<ViewCourse> {
                                     width: MediaQuery.of(context).size.width *
                                         50 /
                                         100,
-                                    child: Text(students[i]['name'],
+                                    child: Text(studentData[i]['name'] ?? '',
                                         style: TextStyle(fontSize: 14))),
                                 Container(
                                     width: MediaQuery.of(context).size.width *
                                         19 /
                                         100,
-                                    child: Text('5.5',
+                                    child: Text(studentData[i]['grade'] ?? '',
                                         style: TextStyle(fontSize: 14))),
                                 IconButton(
                                   icon: Icon(Icons.arrow_forward_ios_sharp),
@@ -179,8 +156,8 @@ class _ViewCourseState extends State<ViewCourse> {
                                     Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                            builder: (context) =>
-                                                ViewStudent()));
+                                            builder: (context) => ViewStudent(
+                                                student: students[i])));
                                   },
                                 )
                               ]));
@@ -193,7 +170,7 @@ class _ViewCourseState extends State<ViewCourse> {
                                 endIndent: 20,
                               );
                             },
-                            itemCount: students.length)
+                            itemCount: studentData.length) //students.length)
                       ],
                     ),
                   )),

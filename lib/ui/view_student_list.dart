@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:mis_app/providers/theme_manager.dart';
 import 'package:mis_app/ui/view_student.dart';
+import 'package:mis_app/models/student_model.dart';
 import 'package:mis_app/util/firebase_utilities.dart';
 
 class StudentList extends StatefulWidget {
@@ -12,7 +13,7 @@ class StudentList extends StatefulWidget {
 }
 
 class _StudentListState extends State<StudentList> {
-  List<String> students = [];
+  List<Student> students = [];
 
   @override
   void initState() {
@@ -51,7 +52,7 @@ class _StudentListState extends State<StudentList> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(students[i],
+                                    Text(students[i].firstName,
                                         style: TextStyle(fontSize: 16)),
                                     IconButton(
                                         icon:
@@ -60,7 +61,9 @@ class _StudentListState extends State<StudentList> {
                                           Navigator.of(context).push(
                                               MaterialPageRoute(
                                                   builder: (context) =>
-                                                      ViewStudent()));
+                                                      ViewStudent(
+                                                          student:
+                                                              students[i])));
                                         }),
                                   ],
                                 ),

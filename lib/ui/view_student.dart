@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:mis_app/models/course_model.dart';
+import 'package:mis_app/util/firebase_utilities.dart';
 import 'package:provider/provider.dart';
 import 'package:mis_app/providers/theme_manager.dart';
 import 'package:mis_app/models/student_model.dart';
+import 'package:mis_app/models/students_score.dart';
+import 'package:mis_app/util/constants.dart';
 
 class ViewStudent extends StatefulWidget {
-  const ViewStudent({Key? key}) : super(key: key);
+  final Student student;
+  const ViewStudent({required this.student});
 
   @override
   _ViewStudentState createState() => _ViewStudentState();
@@ -14,14 +19,24 @@ class ViewStudent extends StatefulWidget {
 class _ViewStudentState extends State<ViewStudent> {
   late Student student;
   String _selectedSemester = 'Semester 1 2021-2022';
-  List<String> semesters = [
-    'Semester 1 2021-2022',
-    'Semester 2 2020-2021',
-    'Semester 1 2020-2021',
-    'Semester 2 2019-20',
-    'Semester 1 2019-2020',
-  ];
+  Course? course;
+  StudentScore? studentScore;
   int index = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    student = widget.student;
+    getStudentClassData();
+  }
+
+  Future getStudentClassData() async {
+    course = await FirebaseUtilities.getClassByCourseName(student.program);
+    if ((course ?? '') == '') return;
+
+    studentScore = await FirebaseUtilities.getStudentsScore(
+        student.program, student.rollNumber);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,13 +58,20 @@ class _ViewStudentState extends State<ViewStudent> {
                               Container(
                                   height: 70,
                                   width: 70,
-                                  child: Image(
-                                    image: AssetImage(
-                                        'assets/icon/placeholder.jpg'),
-                                  )),
+                                  child: (student.photoUrl ?? '') == ''
+                                      ? Image(
+                                          image: AssetImage(
+                                              'assets/icon/placeholder.jpg'),
+                                        )
+                                      : Image(
+                                          image: NetworkImage(
+                                              student.photoUrl ?? ''))),
                               SizedBox(width: 20),
                               Text(
-                                'Moreno, Jerome A.',
+                                FirebaseUtilities.fullName(
+                                    firstName: student.firstName,
+                                    lastName: student.lastName,
+                                    middleName: student.middleName),
                                 style: TextStyle(fontSize: 18),
                               )
                             ]),
@@ -220,13 +242,13 @@ class _ViewStudentState extends State<ViewStudent> {
                                                         CrossAxisAlignment
                                                             .start,
                                                     children: [
-                                                      Text(
-                                                          'Course Name: Kasasysayan 1'),
+                                                      Text('Course Name: ' +
+                                                          course!.name),
                                                       SizedBox(
                                                         height: 20,
                                                       ),
-                                                      Text(
-                                                          'Number of units: 5'),
+                                                      Text('Number of units: ' +
+                                                          course!.unitsCount),
                                                     ],
                                                   ),
                                                 ),
@@ -247,7 +269,7 @@ class _ViewStudentState extends State<ViewStudent> {
                                               right: BorderSide(width: 1.5))),
                                       child: Center(
                                         child: Text(
-                                          'KAS 1',
+                                          course!.code,
                                           style: TextStyle(
                                               fontSize: 12,
                                               color: Colors.blue[800],
@@ -264,7 +286,7 @@ class _ViewStudentState extends State<ViewStudent> {
                                             right: BorderSide(width: 1.5))),
                                     child: Center(
                                       child: Text(
-                                        'A+',
+                                        studentScore!.grade,
                                         style: TextStyle(
                                           fontSize: 12,
                                         ),
@@ -278,7 +300,7 @@ class _ViewStudentState extends State<ViewStudent> {
                                             right: BorderSide(width: 1.5))),
                                     child: Center(
                                       child: Text(
-                                        '8.9',
+                                        studentScore!.grading,
                                         style: TextStyle(
                                           fontSize: 12,
                                         ),
@@ -292,7 +314,7 @@ class _ViewStudentState extends State<ViewStudent> {
                                             right: BorderSide(width: 1.5))),
                                     child: Center(
                                       child: Text(
-                                        '8.94',
+                                        studentScore!.gradePoints,
                                         style: TextStyle(
                                           fontSize: 12,
                                         ),
@@ -300,107 +322,6 @@ class _ViewStudentState extends State<ViewStudent> {
                                     ),
                                   ),
                                 ]),
-                            TableRow(
-                                decoration: BoxDecoration(
-                                    // color: Colors.grey[300],
-                                    border: Border.all(width: 1.5)),
-                                children: [
-                                  InkWell(
-                                    onTap: () async {
-                                      showDialog(
-                                          context: context,
-                                          builder: (BuildContext context) =>
-                                              new AlertDialog(
-                                                backgroundColor: Colors.blue,
-                                                title:
-                                                    new Text('Course Details'),
-                                                content: Container(
-                                                  height: 150,
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      Text(
-                                                          'Course Name: Physical Education'),
-                                                      SizedBox(
-                                                        height: 20,
-                                                      ),
-                                                      Text(
-                                                          'Number of units: 1'),
-                                                    ],
-                                                  ),
-                                                ),
-                                                actions: <Widget>[
-                                                  new IconButton(
-                                                      icon:
-                                                          new Icon(Icons.close),
-                                                      onPressed: () {
-                                                        Navigator.pop(context);
-                                                      })
-                                                ],
-                                              ));
-                                    },
-                                    child: Container(
-                                      height: 30,
-                                      decoration: BoxDecoration(
-                                          border: Border(
-                                              right: BorderSide(width: 1.5))),
-                                      child: Center(
-                                        child: Text(
-                                          'PE 1',
-                                          style: TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.blue[800],
-                                              decoration:
-                                                  TextDecoration.underline),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Container(
-                                    height: 30,
-                                    decoration: BoxDecoration(
-                                        border: Border(
-                                            right: BorderSide(width: 1.5))),
-                                    child: Center(
-                                      child: Text(
-                                        'B++',
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Container(
-                                    height: 30,
-                                    decoration: BoxDecoration(
-                                        border: Border(
-                                            right: BorderSide(width: 1.5))),
-                                    child: Center(
-                                      child: Text(
-                                        '7.645',
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Container(
-                                    height: 30,
-                                    decoration: BoxDecoration(
-                                        border: Border(
-                                            right: BorderSide(width: 1.5))),
-                                    child: Center(
-                                      child: Text(
-                                        '8.94',
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ])
                           ],
                         )
                       ],
