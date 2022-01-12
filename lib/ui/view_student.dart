@@ -32,14 +32,18 @@ class _ViewStudentState extends State<ViewStudent> {
 
   Future getStudentClassData() async {
     course = await FirebaseUtilities.getClassByCourseName(student.program);
-    if ((course ?? '') == '') return;
+    if (course == null) return;
 
     studentScore = await FirebaseUtilities.getStudentsScore(
         student.program, student.rollNumber);
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
+    if (course == null) {
+      return SizedBox();
+    }
     return Consumer<ThemeNotifier>(
         builder: (context, theme, _) => MaterialApp(
             theme: theme.getTheme(),

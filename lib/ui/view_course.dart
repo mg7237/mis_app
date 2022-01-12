@@ -40,9 +40,9 @@ class _ViewCourseState extends State<ViewCourse> {
       studentGrade['name'] = student.lastName;
       studentGrade['grade'] = studentScore.grade;
       studentData.add(studentGrade);
+      print(studentData);
+      setState(() {});
     });
-    print(studentData);
-    setState(() {});
   }
 
   @override
